@@ -24,20 +24,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.parser;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+/**
+ * @author Thomas Børlum <thb@trifork.com>
+ */
+public class ParserException extends RuntimeException {
+	private static final long serialVersionUID = 780632659490028872L;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
+	public ParserException(String message) {
+		super(message);
+	}
 
-@Configuration
-@EnableWebMvc
-public class WebConfig {
+	public ParserException(Throwable cause) {
+		super(cause);
+	}
 
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+	public ParserException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

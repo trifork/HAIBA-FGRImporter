@@ -24,29 +24,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter;
+package dk.nsi.haiba.fgrimporter.importer;
 
-import com.google.common.base.Preconditions;
-import dk.nsi.sdm4.core.domain.Dataset;
-import dk.nsi.sdm4.core.parser.Parser;
-import dk.nsi.sdm4.core.parser.ParserException;
-import dk.nsi.sdm4.core.persistence.Persister;
-import dk.sdsd.nsp.slalog.api.SLALogItem;
-import dk.sdsd.nsp.slalog.api.SLALogger;
+import static dk.nsi.haiba.fgrimporter.importer.Institution.InstitutionType.HOSPITAL;
+import static dk.nsi.haiba.fgrimporter.importer.Institution.InstitutionType.HOSPITAL_DEPARTMENT;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
+import com.google.common.base.Preconditions;
 
-import static dk.nsi.haiba.fgrimporter.Institution.InstitutionType.HOSPITAL;
-import static dk.nsi.haiba.fgrimporter.Institution.InstitutionType.HOSPITAL_DEPARTMENT;
+import dk.nsi.haiba.fgrimporter.parser.Parser;
+import dk.nsi.haiba.fgrimporter.parser.ParserException;
 
 /**
  * Parser for the SKS register.
@@ -104,11 +104,6 @@ import static dk.nsi.haiba.fgrimporter.Institution.InstitutionType.HOSPITAL_DEPA
  * ignoreres alle records hvor operationskode ikke er angivet.
  */
 public class SKSParser implements Parser {
-	@Autowired
-	private SLALogger slaLogger;
-
-	@Autowired
-	private Persister persister;
 
 	private static final int SKS_CODE_START_INDEX = 3;
 	private static final int SKS_CODE_END_INDEX = 23;
@@ -159,20 +154,17 @@ public class SKSParser implements Parser {
 
 		File[] files = datadir.listFiles();
 
-        SLALogItem slaLogItem = slaLogger.createLogItem(getHome()+".process", "SDM4."+getHome()+".process");
-        slaLogItem.setMessageId(identifier);
-        slaLogItem.addCallParameter(Parser.SLA_INPUT_NAME, datadir.getAbsolutePath());
 		try {
 			Preconditions.checkArgument(files.length == 1, "Only one file should be present at this point.");
-            persister.resetTransactionTime();
 
             long processed = 0;
 			LineIterator lines = null;
 			try {
 				lines = FileUtils.lineIterator(files[0], FILE_ENCODING);
 
-				Dataset<Institution> dataset = innerParse(lines);
-				persister.persistDeltaDataset(dataset);
+				List<Institution> dataset = innerParse(lines);
+				// TODO - dao.savethislist(dataset)
+				
                 processed += dataset.size();
 			} catch (IOException e) {
 				throw new ParserException(e);
@@ -182,12 +174,7 @@ public class SKSParser implements Parser {
 			} finally {
 				LineIterator.closeQuietly(lines);
 			}
-            slaLogItem.addCallParameter(Parser.SLA_RECORDS_PROCESSED_MAME, ""+processed);
-			slaLogItem.setCallResultOk();
-			slaLogItem.store();
 		} catch (RuntimeException e) {
-			slaLogItem.setCallResultError("SKSParser failed - Cause: " + e.getMessage());
-			slaLogItem.store();
 
 			throw e;
 		}
@@ -198,8 +185,8 @@ public class SKSParser implements Parser {
 		return "sksimporter";
 	}
 
-	private Dataset<Institution> innerParse(Iterator<String> lines) {
-		Dataset<Institution> dataset = new Dataset<Institution>(Institution.class);
+	private List<Institution> innerParse(Iterator<String> lines) {
+		List<Institution> dataset = new ArrayList<Institution>();
 
 		while (lines.hasNext()) {
 			Institution institution = parseLine(lines.next());

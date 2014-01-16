@@ -24,20 +24,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.status;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.joda.time.DateTime;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
-
-@Configuration
-@EnableWebMvc
-public class WebConfig {
-
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+public interface TimeSource {
+	DateTime now();
 }

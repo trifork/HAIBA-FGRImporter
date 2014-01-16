@@ -26,22 +26,23 @@
  */
 package dk.nsi.haiba.fgrimporter.config;
 
-import dk.nsi.haiba.fgrimporter.SKSParser;
-import dk.nsi.sdm4.core.parser.Parser;
-import dk.nsi.sdm4.core.persistence.AuditingPersister;
-import dk.nsi.sdm4.core.persistence.Persister;
+import static org.mockito.Mockito.mock;
+
+import javax.sql.DataSource;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-public class SksimporterApplicationConfig {
-    @Bean
-    public Parser parser() {
-		return new SKSParser();
-	}
+@EnableTransactionManagement
+@PropertySource("test.properties")
+public class FGRTestConfiguration extends FGRConfiguration {
 
     @Bean
-    public Persister persister() {
-        return new AuditingPersister();
+    public DataSource haibaDataSource() {
+        return mock(DataSource.class);
     }
+
 }

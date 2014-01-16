@@ -24,7 +24,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter;
+package dk.nsi.haiba.fgrimporter.importer;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -32,7 +32,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import dk.nsi.haiba.fgrimporter.SKSParser;
+import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 
 import java.io.File;
 import java.io.IOException;

@@ -24,20 +24,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.exception;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+@SuppressWarnings("serial")
+public class DAOException extends RuntimeException {
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
+	public DAOException(String message) {
+		super(message);
+	}
 
-@Configuration
-@EnableWebMvc
-public class WebConfig {
-
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+	public DAOException(String message, Throwable t) {
+		super(message, t);
+	}
+	
+	public DAOException(Throwable t) {
+		super(t.getMessage(), t);
+	}
 }

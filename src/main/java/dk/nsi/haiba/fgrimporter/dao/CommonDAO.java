@@ -24,20 +24,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.dao;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.beans.factory.annotation.Value;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
+public class CommonDAO {
+	
+	protected final String MYSQL = "MySQL";
+	protected final String MSSQL = "MSSQL";
+	
+	@Value("${jdbc.dialect}")
+	private String dialect;
 
-@Configuration
-@EnableWebMvc
-public class WebConfig {
+	public String getDialect() {
+		return dialect;
+	}
 
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+	public void setDialect(String dialect) {
+		this.dialect = dialect;
+	}
+	
+
 }

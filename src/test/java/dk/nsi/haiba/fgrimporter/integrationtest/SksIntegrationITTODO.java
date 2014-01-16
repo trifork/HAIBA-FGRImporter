@@ -27,9 +27,9 @@
 
 package dk.nsi.haiba.fgrimporter.integrationtest;
 
-import dk.nsi.haiba.fgrimporter.SKSParser;
-import dk.nsi.haiba.fgrimporter.config.SksimporterApplicationConfig;
-import dk.nsi.sdm4.testutils.TestDbConfiguration;
+import dk.nsi.haiba.fgrimporter.config.FGRConfiguration;
+import dk.nsi.haiba.fgrimporter.config.FGRTestConfiguration;
+import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
@@ -59,7 +59,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
-@ContextConfiguration(classes = {SksimporterApplicationConfig.class, TestDbConfiguration.class})
+@ContextConfiguration(classes = {FGRConfiguration.class, FGRTestConfiguration.class})
 public class SksIntegrationITTODO
 {
 	@Rule

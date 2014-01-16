@@ -26,30 +26,16 @@
  */
 package dk.nsi.haiba.fgrimporter.config;
 
-import dk.nsi.haiba.fgrimporter.SKSParser;
-import dk.nsi.sdm4.core.config.StamdataConfiguration;
-import dk.nsi.sdm4.core.parser.Parser;
-import dk.nsi.sdm4.core.parser.ParserException;
-import dk.nsi.sdm4.core.persistence.AuditingPersister;
-import dk.nsi.sdm4.core.persistence.Persister;
-import dk.sdsd.nsp.slalog.api.SLALogConfig;
-import dk.sdsd.nsp.slalog.api.SLALogger;
+import dk.nsi.haiba.fgrimporter.importer.SKSParser;
+import dk.nsi.haiba.fgrimporter.parser.Parser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import java.io.File;
-import java.sql.SQLException;
 
 @Configuration
-@EnableScheduling
-@EnableTransactionManagement
-//The Spring Java Configuration annotations above needs to be on this class, not on the abstract superclass to
-// make Spring stop complaining about weird things
-public class SksimporterInfrastructureConfig extends StamdataConfiguration {
-	@Bean
-	public SLALogger slaLogger() {
-		return new SLALogConfig("Stamdata SKS-importer", "sksimporter").getSLALogger();
+public class FGRConfiguration {
+    @Bean
+    public Parser parser() {
+		return new SKSParser();
 	}
+
 }

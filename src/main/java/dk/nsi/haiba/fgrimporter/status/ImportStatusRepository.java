@@ -24,20 +24,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.status;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.joda.time.DateTime;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
+/**
+ * Represents the import status and deadline information for the LPR importer
+ */
+public interface ImportStatusRepository {
+	void importStartedAt(DateTime startTime);
 
-@Configuration
-@EnableWebMvc
-public class WebConfig {
+	ImportStatus getLatestStatus();
+	
+	boolean isOverdue();
 
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+	boolean isHAIBADBAlive();
+
+	void importEndedWithSuccess(DateTime endTime);
+
+	void importEndedWithFailure(DateTime endTime, String errorMessage);
 }

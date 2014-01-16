@@ -24,20 +24,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.parser;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import static java.lang.String.format;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
-
-@Configuration
-@EnableWebMvc
-public class WebConfig {
-
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+public class OutOfSequenceException extends ParserException {
+	public OutOfSequenceException(String currentVersion, String newVersion) {
+		super(format("Import out of sequence. current_version=%s, new_version=%s.", currentVersion, newVersion));
+	}
 }

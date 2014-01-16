@@ -24,93 +24,56 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package dk.nsi.haiba.fgrimporter.log;
 
-package dk.nsi.haiba.fgrimporter;
+import org.apache.log4j.Logger;
 
-import dk.nsi.sdm4.core.domain.AbstractStamdataEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import java.util.Date;
-
-@Entity(name = "Organisation")
-public class Institution extends AbstractStamdataEntity
-{
-	private Date validFrom;
-	private Date validTo;
+/*
+ * Wrapper class for Log4j - so the "is?enabled" methods are hidden away from regular code
+ */
+public class Log {
 	
-	private String navn;
-	private String nummer;
-
-	private final InstitutionType type;
-
-	public enum InstitutionType
-	{
-		HOSPITAL_DEPARTMENT, HOSPITAL
+	Logger logger;
+	
+	public Log(Logger logger) {
+		this.logger = logger;
 	}
 
-	public Institution(InstitutionType organisationstype)
-	{
-		this.type = organisationstype;
-	}
-
-	public Date getValidTo()
-	{
-		return validTo;
-	}
-
-	public void setValidTo(Date validTo)
-	{
-		this.validTo = validTo;
-	}
-
-	@Column
-	public String getNavn()
-	{
-		return navn;
-	}
-
-	public void setNavn(String navn)
-	{
-		this.navn = navn;
-	}
-
-	@Id
-	@Column
-	public String getNummer()
-	{
-		return nummer;
-	}
-
-	public void setNummer(String nummer)
-	{
-		this.nummer = nummer;
-	}
-
-	@Column
-	public String getOrganisationstype()
-	{
-		if (type == InstitutionType.HOSPITAL_DEPARTMENT)
-		{
-			return "Afdeling";
+	public void trace(String message) {
+		if(logger.isTraceEnabled()) {
+			logger.trace(message);
 		}
-		else if (type == InstitutionType.HOSPITAL)
-		{
-			return "Sygehus";
+	}
+
+	public void debug(String message) {
+		if(logger.isDebugEnabled()) {
+			logger.debug(message);
 		}
-
-		return null;
 	}
 
-	public void setValidFrom(Date validFrom)
-	{
-		this.validFrom = validFrom;
+	public void debug(String message, Throwable t) {
+		if(logger.isDebugEnabled()) {
+			logger.debug(message, t);
+		}
 	}
 
-	@Override
-	public Date getValidFrom()
-	{
-		return validFrom;
+	public void warn(String message) {
+		logger.warn(message);
 	}
+
+	public void info(String message) {
+		if(logger.isInfoEnabled()) {
+			logger.info(message);
+		}
+	}
+
+	public void error(String message) {
+		logger.error(message);
+	}
+	
+	public void error(String message, Throwable t) {
+		logger.error(message, t);
+	}
+	
 }

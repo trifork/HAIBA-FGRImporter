@@ -26,18 +26,33 @@
  */
 package dk.nsi.haiba.fgrimporter.config;
 
-import org.springframework.context.annotation.Bean;
+import static org.junit.Assert.assertNotNull;
+
+import javax.inject.Inject;
+import javax.sql.DataSource;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = {CommonInfrastructureConfigTest.TestConfiguration.class})
+public class CommonInfrastructureConfigTest {
+    @Inject
+    @Qualifier("haibaDataSource")
+    DataSource datasource;
 
-@Configuration
-@EnableWebMvc
-public class WebConfig {
+    @Configuration
+    @Import({FGRTestConfiguration.class})
+    static class TestConfiguration {
+    }
 
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
+    @Test
+    public void canCreateConfiguration() throws Exception {
+        assertNotNull(datasource);
     }
 }

@@ -24,20 +24,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.config;
+package dk.nsi.haiba.fgrimporter.dao;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import java.util.List;
 
-import dk.nsi.haiba.fgrimporter.status.StatusReporter;
+import dk.nsi.haiba.fgrimporter.exception.DAOException;
+import dk.nsi.haiba.fgrimporter.importer.Institution;
 
-@Configuration
-@EnableWebMvc
-public class WebConfig {
 
-    @Bean
-    public StatusReporter statusReporter() {
-        return new StatusReporter();
-    }
+public interface HAIBADAO {
+	
+	void saveInstitutionList(List<Institution> institution) throws DAOException;
+
 }
