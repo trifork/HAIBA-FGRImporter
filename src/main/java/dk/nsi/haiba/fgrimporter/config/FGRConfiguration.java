@@ -26,16 +26,128 @@
  */
 package dk.nsi.haiba.fgrimporter.config;
 
-import dk.nsi.haiba.fgrimporter.importer.SKSParser;
-import dk.nsi.haiba.fgrimporter.parser.Parser;
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
+import dk.nsi.haiba.fgrimporter.dao.impl.HAIBADAOImpl;
+import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
+import dk.nsi.haiba.fgrimporter.importer.SKSParser;
+import dk.nsi.haiba.fgrimporter.parser.DirectoryInbox;
+import dk.nsi.haiba.fgrimporter.parser.Inbox;
+import dk.nsi.haiba.fgrimporter.parser.Parser;
+import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
+import dk.nsi.haiba.fgrimporter.status.ImportStatusRepositoryJdbcImpl;
+import dk.nsi.haiba.fgrimporter.status.TimeSource;
+import dk.nsi.haiba.fgrimporter.status.TimeSourceRealTimeImpl;
+
+/**
+ * Configuration class 
+ * providing the common infrastructure.
+ */
 @Configuration
+@EnableScheduling
+@EnableTransactionManagement
 public class FGRConfiguration {
-    @Bean
+
+	@Value("${jdbc.haibaJNDIName}")
+	private String haibaJdbcJNDIName;
+	
+	@Value("${dataDir}")
+	private String dataDir;
+
+
+	// this is not automatically registered, see https://jira.springsource.org/browse/SPR-8539
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+		propertySourcesPlaceholderConfigurer.setIgnoreResourceNotFound(true);
+		propertySourcesPlaceholderConfigurer.setIgnoreUnresolvablePlaceholders(false);
+
+		propertySourcesPlaceholderConfigurer.setLocations(new Resource[]{new ClassPathResource("default-config.properties"), new ClassPathResource("epimibaconfig.properties")});
+
+		return propertySourcesPlaceholderConfigurer;
+	}
+
+	@Bean
+	@Qualifier("haibaDataSource")
+	public DataSource haibaDataSource() throws Exception {
+		JndiObjectFactoryBean factory = new JndiObjectFactoryBean();
+		factory.setJndiName(haibaJdbcJNDIName);
+		factory.setExpectedType(DataSource.class);
+		factory.afterPropertiesSet();
+		return (DataSource) factory.getObject();
+	}
+
+	@Bean
+	public JdbcTemplate haibaJdbcTemplate(@Qualifier("haibaDataSource") DataSource ds) {
+		return new JdbcTemplate(ds);
+	}
+
+	@Bean
+	@Qualifier("haibaTransactionManager")
+	public PlatformTransactionManager haibaTransactionManager(@Qualifier("haibaDataSource") DataSource ds) {
+		return new DataSourceTransactionManager(ds);
+	}
+
+	// This needs the static modifier due to https://jira.springsource.org/browse/SPR-8269. If not static, field jdbcJndiName
+	// will not be set when trying to instantiate the DataSource
+	@Bean
+	public static CustomScopeConfigurer scopeConfigurer() {
+		return new SimpleThreadScopeConfigurer();
+	}
+	
+	@Bean
+	public ImportStatusRepository statusRepo() {
+		return new ImportStatusRepositoryJdbcImpl(); 
+	}
+
+	@Bean
+	public ImportExecutor importExecutor() {
+		return new ImportExecutor();
+	}
+
+	@Bean
+	public TimeSource timeSource() {
+		return new TimeSourceRealTimeImpl();
+	}
+
+	@Bean
+    public ReloadableResourceBundleMessageSource messageSource(){
+        ReloadableResourceBundleMessageSource messageSource=new ReloadableResourceBundleMessageSource();
+        String[] resources= {"classpath:messages"};
+        messageSource.setBasenames(resources);
+        return messageSource;
+    }
+	
+	@Bean
+    public HAIBADAO haibaDao() {
+        return new HAIBADAOImpl();
+    }
+	
+	@Bean
     public Parser parser() {
 		return new SKSParser();
 	}
 
+	@Bean
+	public Inbox inbox() throws Exception {
+		return new DirectoryInbox(dataDir,"fgrparser");
+	}
+	
 }

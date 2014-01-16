@@ -26,14 +26,12 @@
  */
 package dk.nsi.haiba.fgrimporter.dao;
 
-import java.util.List;
-
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
-import dk.nsi.haiba.fgrimporter.importer.Institution;
+import dk.nsi.haiba.fgrimporter.importer.Organisation;
 
 
 public interface HAIBADAO {
 	
-	void saveInstitutionList(List<Institution> institution) throws DAOException;
-
+	public void saveOrganisation(Organisation org) throws DAOException;
+	public void clearOrganisationTable() throws DAOException;
 }

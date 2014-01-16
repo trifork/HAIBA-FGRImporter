@@ -26,8 +26,8 @@
  */
 package dk.nsi.haiba.fgrimporter.importer;
 
-import static dk.nsi.haiba.fgrimporter.importer.Institution.InstitutionType.HOSPITAL;
-import static dk.nsi.haiba.fgrimporter.importer.Institution.InstitutionType.HOSPITAL_DEPARTMENT;
+import static dk.nsi.haiba.fgrimporter.importer.Organisation.InstitutionType.HOSPITAL;
+import static dk.nsi.haiba.fgrimporter.importer.Organisation.InstitutionType.HOSPITAL_DEPARTMENT;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,12 +39,15 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.log4j.Logger;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Preconditions;
 
+import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
+import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.parser.ParserException;
 
@@ -105,6 +108,11 @@ import dk.nsi.haiba.fgrimporter.parser.ParserException;
  */
 public class SKSParser implements Parser {
 
+	private static Log log = new Log(Logger.getLogger(SKSParser.class));
+
+	@Autowired
+	HAIBADAO haibaDao;
+
 	private static final int SKS_CODE_START_INDEX = 3;
 	private static final int SKS_CODE_END_INDEX = 23;
 
@@ -157,15 +165,22 @@ public class SKSParser implements Parser {
 		try {
 			Preconditions.checkArgument(files.length == 1, "Only one file should be present at this point.");
 
-            long processed = 0;
 			LineIterator lines = null;
 			try {
 				lines = FileUtils.lineIterator(files[0], FILE_ENCODING);
-
-				List<Institution> dataset = innerParse(lines);
-				// TODO - dao.savethislist(dataset)
 				
-                processed += dataset.size();
+				// First clear the table
+				haibaDao.clearOrganisationTable();
+				
+				// Then import
+				List<Organisation> dataset = innerParse(lines);
+				// TODO . check performance on this iteration
+				for (Organisation organisation : dataset) {
+					haibaDao.saveOrganisation(organisation);
+				}
+				
+                log.debug("Processed "+dataset.size()+ " lines");
+                
 			} catch (IOException e) {
 				throw new ParserException(e);
 			} catch (Exception e) {
@@ -185,11 +200,11 @@ public class SKSParser implements Parser {
 		return "sksimporter";
 	}
 
-	private List<Institution> innerParse(Iterator<String> lines) {
-		List<Institution> dataset = new ArrayList<Institution>();
+	private List<Organisation> innerParse(Iterator<String> lines) {
+		List<Organisation> dataset = new ArrayList<Organisation>();
 
 		while (lines.hasNext()) {
-			Institution institution = parseLine(lines.next());
+			Organisation institution = parseLine(lines.next());
 
 			if (institution != null) {
 				dataset.add(institution);
@@ -199,7 +214,7 @@ public class SKSParser implements Parser {
 		return dataset;
 	}
 
-	private Institution parseLine(String line) {
+	private Organisation parseLine(String line) {
 		// Determine the record type.
 		//
 		String recordType = line.substring(ENTRY_TYPE_START_INDEX, ENTRY_TYPE_END_INDEX);
@@ -222,9 +237,9 @@ public class SKSParser implements Parser {
 		if (code == OPERATION_CODE_CREATE || code == OPERATION_CODE_UPDATE) {
 			// Create and update are handled the same way.
 
-			Institution.InstitutionType type = recordType.equals(RECORD_TYPE_DEPARTMENT) ? HOSPITAL_DEPARTMENT : HOSPITAL;
+			Organisation.InstitutionType type = recordType.equals(RECORD_TYPE_DEPARTMENT) ? HOSPITAL_DEPARTMENT : HOSPITAL;
 
-			Institution institution = new Institution(type);
+			Organisation institution = new Organisation(type);
 
 			institution.setNummer(line.substring(SKS_CODE_START_INDEX, SKS_CODE_END_INDEX).trim());
 

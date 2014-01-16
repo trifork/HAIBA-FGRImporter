@@ -1,3 +1,6 @@
+CREATE DATABASE IF NOT EXISTS HAIBA;
+USE HAIBA;
+
  CREATE TABLE IF NOT EXISTS Organisation (
 	OrganisationPID BIGINT(15) AUTO_INCREMENT NOT NULL PRIMARY KEY,
 
@@ -13,3 +16,15 @@
 	INDEX (OrganisationPID, ModifiedDate),
 	INDEX (Nummer, ValidTo, ValidFrom)
 ) ENGINE=InnoDB COLLATE=utf8_bin;
+
+CREATE TABLE IF NOT EXISTS FGRImporterStatus (
+    Id BIGINT(15) AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    StartTime DATETIME NOT NULL,
+    EndTime DATETIME,
+    Outcome VARCHAR(20),
+    ErrorMessage VARCHAR(200),
+
+    INDEX (StartTime)
+) ENGINE=InnoDB COLLATE=utf8_bin;
+
+
