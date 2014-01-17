@@ -26,6 +26,9 @@
  */
 package dk.nsi.haiba.fgrimporter.dao.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -52,15 +55,16 @@ public class HAIBADAOImpl extends CommonDAO implements HAIBADAO {
 	public void saveOrganisation(Organisation org) throws DAOException {
 
 		try {
+
+			SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+			String created = formatter.format(new Date()); 
 			
-			String sql = "INSERT INTO Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, ?, ?, ?, ?)";
+			String sql = "INSERT INTO Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"+created+"', '"+created+"', ?, ?)";
 
 			Object[] args = new Object[] {
 				org.getNummer(),
 				org.getNavn(),
 				org.getOrganisationstype(),
-				org.getCreated(),
-				org.getModified(),
 				org.getValidFrom(),
 				org.getValidTo()
 			};

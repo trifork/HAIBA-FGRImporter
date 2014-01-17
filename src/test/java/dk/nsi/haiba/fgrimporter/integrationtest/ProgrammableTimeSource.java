@@ -24,68 +24,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package dk.nsi.haiba.fgrimporter.integrationtest;
 
-package dk.nsi.haiba.fgrimporter.importer;
+import org.joda.time.DateTime;
 
-import java.util.Date;
+import dk.nsi.haiba.fgrimporter.status.TimeSource;
 
-public class Organisation {
-	private Date validFrom;
-	private Date validTo;
 
-	private String navn;
-	private String nummer;
+public class ProgrammableTimeSource implements TimeSource {
+	DateTime now = new DateTime();
 
-	private final InstitutionType type;
-
-	public enum InstitutionType {
-		HOSPITAL_DEPARTMENT, HOSPITAL
+	@Override
+	public DateTime now() {
+		return now;
 	}
-
-	public Organisation(InstitutionType organisationstype) {
-		this.type = organisationstype;
-	}
-
-	public Date getValidTo() {
-		return validTo;
-	}
-
-	public void setValidTo(Date validTo) {
-		this.validTo = validTo;
-	}
-
-	public String getNavn() {
-		return navn;
-	}
-
-	public void setNavn(String navn) {
-		this.navn = navn;
-	}
-
-	public String getNummer() {
-		return nummer;
-	}
-
-	public void setNummer(String nummer) {
-		this.nummer = nummer;
-	}
-
-	public String getOrganisationstype() {
-		if (type == InstitutionType.HOSPITAL_DEPARTMENT) {
-			return "Afdeling";
-		} else if (type == InstitutionType.HOSPITAL) {
-			return "Sygehus";
-		}
-
-		return null;
-	}
-
-	public void setValidFrom(Date validFrom) {
-		this.validFrom = validFrom;
-	}
-
-	public Date getValidFrom() {
-		return validFrom;
-	}
-	
 }
