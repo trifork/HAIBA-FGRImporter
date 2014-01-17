@@ -34,7 +34,7 @@ import dk.nsi.haiba.fgrimporter.model.Sygehus;
 import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
 
 
-public interface HAIBADAO {
+public interface SHAKDAO {
 	
 	public void saveOrganisation(Organisation org) throws DAOException;
 	public void clearOrganisationTable() throws DAOException;

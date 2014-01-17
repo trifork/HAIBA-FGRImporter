@@ -34,7 +34,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
+import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.parser.Inbox;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
@@ -50,7 +50,7 @@ public class ImportExecutor {
 	private boolean manualOverride;
 	
 	@Autowired
-	HAIBADAO haibaDao;
+	SHAKDAO haibaDao;
 
 	@Autowired
 	ImportStatusRepository statusRepo;

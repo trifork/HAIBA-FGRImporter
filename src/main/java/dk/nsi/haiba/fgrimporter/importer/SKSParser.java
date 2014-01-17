@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Preconditions;
 
-import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
+import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.parser.ParserException;
@@ -111,7 +111,7 @@ public class SKSParser implements Parser {
 	private static Log log = new Log(Logger.getLogger(SKSParser.class));
 
 	@Autowired
-	HAIBADAO haibaDao;
+	SHAKDAO haibaDao;
 
 	private static final int SKS_CODE_START_INDEX = 3;
 	private static final int SKS_CODE_END_INDEX = 23;

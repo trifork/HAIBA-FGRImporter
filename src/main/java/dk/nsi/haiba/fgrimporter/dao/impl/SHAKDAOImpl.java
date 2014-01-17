@@ -38,7 +38,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import dk.nsi.haiba.fgrimporter.dao.CommonDAO;
-import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
+import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.importer.Organisation;
 import dk.nsi.haiba.fgrimporter.log.Log;
@@ -46,9 +46,9 @@ import dk.nsi.haiba.fgrimporter.model.Sygehus;
 import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
 
 @Transactional("haibaTransactionManager")
-public class HAIBADAOImpl extends CommonDAO implements HAIBADAO {
+public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
 
-	private static Log log = new Log(Logger.getLogger(HAIBADAOImpl.class));
+	private static Log log = new Log(Logger.getLogger(SHAKDAOImpl.class));
 
 	@Autowired
 	@Qualifier("haibaJdbcTemplate")

@@ -29,7 +29,6 @@ package dk.nsi.haiba.fgrimporter.integrationtest;
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -37,14 +36,9 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,8 +56,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 
-import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
-import dk.nsi.haiba.fgrimporter.dao.impl.HAIBADAOImpl;
+import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 
 /*
@@ -80,8 +74,8 @@ public class SKSIT {
     @Import(FGRIntegrationTestConfiguration.class)
     static class ContextConfiguration {
         @Bean
-        public HAIBADAO haibaDao() {
-            return new HAIBADAOImpl();
+        public SHAKDAO haibaDao() {
+            return new SHAKDAOImpl();
         }
 
     }
@@ -91,7 +85,7 @@ public class SKSIT {
     JdbcTemplate jdbc;
     
     @Autowired
-    HAIBADAO haibaDao;
+    SHAKDAO haibaDao;
 
 	@Rule
 	public TemporaryFolder tmpDir = new TemporaryFolder();
