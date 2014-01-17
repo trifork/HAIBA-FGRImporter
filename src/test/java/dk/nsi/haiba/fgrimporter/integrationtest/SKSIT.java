@@ -28,10 +28,14 @@ package dk.nsi.haiba.fgrimporter.integrationtest;
 
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -111,7 +115,53 @@ public class SKSIT {
 		assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Afdeling'"));
 	}
 	
-	private File datasetDirWith(String filename) throws IOException {
+    @Test
+    public void validToAndFromInclusive() throws IOException, ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // Rigshospitalet have the following date specified in input:
+        // Valid from inclusive = 19760401
+        // Valid to inclusive = 25000101
+
+        importer.process(datasetDirWith("data/sks/SHAKCOMPLETE.TXT"), "");
+        Date validTo = jdbc.queryForObject("SELECT ValidTo FROM Organisation WHERE Navn='Rigshospitalet'", Date.class);
+        Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM Organisation WHERE Navn='Rigshospitalet'", Date.class);
+
+        Date lastValidTo = formatter.parse("2500-01-01 23:59:58"); //2500-01-02 00:00:00.0
+        Date firstInvalidTo = formatter.parse("2500-01-02 00:00:01");
+        assertTrue(validTo.after(lastValidTo));
+        assertTrue(validTo.before(firstInvalidTo));
+
+        Date firstValidFrom = formatter.parse("1976-04-01 00:00:01");
+        Date lastInvalidBefore = formatter.parse("1976-03-31 23:59:58");
+        assertTrue(validFrom.after(lastInvalidBefore));
+        assertTrue(validFrom.before(firstValidFrom));
+    }
+
+    @Test
+    public void updatesValidToAndModifiedDate() throws IOException, InterruptedException {
+
+        importer.process(datasetDirWith("data/sks/SHAKCOMPLETE.TXT"), "");
+        Timestamp timestamp = new Timestamp((new Date()).getTime());
+        Timestamp modified1 = jdbc.queryForObject("SELECT ModifiedDate FROM Organisation LIMIT 1", Timestamp.class);
+
+        // Check no records are invalidated
+        long cntFirstImport = jdbc.queryForLong("SELECT count(1) FROM Organisation WHERE ValidTo<=?", timestamp);
+
+        // Check no invalid records exist
+        Thread.sleep(1000);
+        importer.process(datasetDirWith("data/sks2/SHAKCOMPLETE.TXT"), "");
+        timestamp = new Timestamp((new Date()).getTime());
+
+        // Check some records have been invalidated
+        long cntSecondImport = jdbc.queryForLong("SELECT count(1) FROM Organisation WHERE ValidTo<=?", timestamp);
+        assertTrue(cntSecondImport > cntFirstImport);
+
+        // Check modified date has changed
+        Timestamp modified2 = jdbc.queryForObject("SELECT ModifiedDate FROM Organisation ORDER BY ModifiedDate DESC LIMIT 1", Timestamp.class);
+        assertFalse(modified1.equals(modified2));
+    }
+
+    private File datasetDirWith(String filename) throws IOException {
 		File datasetDir = tmpDir.newFolder();
 		FileUtils.copyFileToDirectory(getFile(filename), datasetDir);
 		return datasetDir;
