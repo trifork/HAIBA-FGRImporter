@@ -48,6 +48,7 @@ import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.HAIBADAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
+import dk.nsi.haiba.fgrimporter.importer.SORImporter;
 import dk.nsi.haiba.fgrimporter.parser.DirectoryInbox;
 import dk.nsi.haiba.fgrimporter.parser.Inbox;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
@@ -55,6 +56,8 @@ import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepositoryJdbcImpl;
 import dk.nsi.haiba.fgrimporter.status.TimeSource;
 import dk.nsi.haiba.fgrimporter.status.TimeSourceRealTimeImpl;
+import dk.nsi.sdm4.core.persistence.AuditingPersister;
+import dk.nsi.sdm4.core.persistence.Persister;
 
 /**
  * Configuration class 
@@ -141,7 +144,7 @@ public class FGRConfiguration {
     }
 	
 	@Bean
-    public Parser parser() {
+    public Parser shakParser() {
 		return new SKSParser();
 	}
 
@@ -150,4 +153,8 @@ public class FGRConfiguration {
 		return new DirectoryInbox(dataDir,"fgrparser");
 	}
 	
+    @Bean
+    public Parser sorParser() {
+        return new SORImporter();
+    }
 }

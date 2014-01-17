@@ -24,22 +24,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.dao;
 
-import java.util.Collection;
+package dk.nsi.haiba.fgrimporter.model.xmlmodel;
 
-import dk.nsi.haiba.fgrimporter.exception.DAOException;
-import dk.nsi.haiba.fgrimporter.importer.Organisation;
-import dk.nsi.haiba.fgrimporter.model.Sygehus;
-import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public interface HAIBADAO {
-	
-	public void saveOrganisation(Organisation org) throws DAOException;
-	public void clearOrganisationTable() throws DAOException;
-    public void persistSygehuse(Collection<Sygehus> entities);
-    public void persistSygehuseAfdelinger(Collection<SygehusAfdeling> entities);
-    public void clearSygehuse();
-    public void clearSygehusAfdelinger();
+public class InstitutionOwnerEntity extends InstitutionOwner
+{
+	private Long RegionCode;
+	private List<HealthInstitutionEntity> healthInstitutionEntities;
+
+	public InstitutionOwnerEntity()
+	{
+		this.healthInstitutionEntities = new ArrayList<HealthInstitutionEntity>();
+	}
+
+	public Long getRegionCode()
+	{
+		return RegionCode;
+	}
+
+	public void setRegionCode(Long regionCode)
+	{
+		RegionCode = regionCode;
+	}
+
+	public List<HealthInstitutionEntity> getHealthInstitutionEntity()
+	{
+		return healthInstitutionEntities;
+	}
+
+	public void setHealthInstitutionEntity(HealthInstitutionEntity healthInstitutionEntity)
+	{
+		healthInstitutionEntity.setInstitutionOwnerEntity(this);
+		this.healthInstitutionEntities.add(healthInstitutionEntity);
+
+	}
+
 }

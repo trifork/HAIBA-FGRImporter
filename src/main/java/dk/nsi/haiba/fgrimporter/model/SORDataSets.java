@@ -24,22 +24,67 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.dao;
 
-import java.util.Collection;
+package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.haiba.fgrimporter.exception.DAOException;
-import dk.nsi.haiba.fgrimporter.importer.Organisation;
-import dk.nsi.haiba.fgrimporter.model.Sygehus;
-import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
+import dk.nsi.sdm4.core.domain.CompleteDataset;
 
 
-public interface HAIBADAO {
-	
-	public void saveOrganisation(Organisation org) throws DAOException;
-	public void clearOrganisationTable() throws DAOException;
-    public void persistSygehuse(Collection<Sygehus> entities);
-    public void persistSygehuseAfdelinger(Collection<SygehusAfdeling> entities);
-    public void clearSygehuse();
-    public void clearSygehusAfdelinger();
+public class SORDataSets
+{
+	private CompleteDataset<Apotek> apotekDS;
+	private CompleteDataset<Yder> yderDS;
+	private CompleteDataset<Praksis> praksisDS;
+	private CompleteDataset<Sygehus> sygehusDS;
+	private CompleteDataset<SygehusAfdeling> sygehusAfdelingDS;
+
+	public CompleteDataset<Apotek> getApotekDS()
+	{
+		return apotekDS;
+	}
+
+	public void setApotekDS(CompleteDataset<Apotek> apotekDS)
+	{
+		this.apotekDS = apotekDS;
+	}
+
+	public CompleteDataset<Yder> getYderDS()
+	{
+		return yderDS;
+	}
+
+	public void setYderDS(CompleteDataset<Yder> yderDS)
+	{
+		this.yderDS = yderDS;
+	}
+
+	public CompleteDataset<Praksis> getPraksisDS()
+	{
+		return praksisDS;
+	}
+
+	public void setPraksisDS(CompleteDataset<Praksis> praksisDS)
+	{
+		this.praksisDS = praksisDS;
+	}
+
+	public CompleteDataset<Sygehus> getSygehusDS()
+	{
+		return sygehusDS;
+	}
+
+	public void setSygehusDS(CompleteDataset<Sygehus> sygehusDS)
+	{
+		this.sygehusDS = sygehusDS;
+	}
+
+	public CompleteDataset<SygehusAfdeling> getSygehusAfdelingDS()
+	{
+		return sygehusAfdelingDS;
+	}
+
+	public void setSygehusAfdelingDS(CompleteDataset<SygehusAfdeling> sygehusAfdelingDS)
+	{
+		this.sygehusAfdelingDS = sygehusAfdelingDS;
+	}
 }

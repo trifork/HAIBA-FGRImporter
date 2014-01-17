@@ -59,7 +59,7 @@ public class ImportExecutor {
 	Inbox inbox;
 
 	@Autowired
-	Parser parser;
+	Parser shakParser;
 
 	@Scheduled(cron = "${cron.import.job}")
 	public void run() {
@@ -75,6 +75,8 @@ public class ImportExecutor {
 	 * Separated into its own method for testing purpose, because testing a scheduled method isn't good
 	 */
 	public void doProcess() {
+	    // TODO hent filer fra urler
+	    
 		// Fetch new records from LPR contact table
 		try {
 			statusRepo.importStartedAt(new DateTime());
@@ -87,7 +89,7 @@ public class ImportExecutor {
 
 				if (dataSet != null) {
 
-					parser.process(dataSet, "TODO");
+					shakParser.process(dataSet, "TODO");
 
 					// Once the import is complete
 					// we can remove the data set

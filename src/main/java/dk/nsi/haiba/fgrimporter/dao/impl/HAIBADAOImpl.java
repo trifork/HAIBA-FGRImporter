@@ -27,6 +27,7 @@
 package dk.nsi.haiba.fgrimporter.dao.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,8 @@ import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.importer.Organisation;
 import dk.nsi.haiba.fgrimporter.log.Log;
+import dk.nsi.haiba.fgrimporter.model.Sygehus;
+import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
 
 @Transactional("haibaTransactionManager")
 public class HAIBADAOImpl extends CommonDAO implements HAIBADAO {
@@ -87,4 +90,27 @@ public class HAIBADAOImpl extends CommonDAO implements HAIBADAO {
         }
 	}
 
+    @Override
+    public void clearSygehuse() {
+        jdbc.update("TRUNCATE TABLE Sygehus");
+    }
+    
+    @Override
+    public void clearSygehusAfdelinger() {
+        jdbc.update("TRUNCATE TABLE SygehusAfdeling");
+    }
+
+    @Override
+    public void persistSygehuseAfdelinger(Collection<SygehusAfdeling> entities) {
+        for (SygehusAfdeling sygehusAfdeling : entities) {
+            
+        }
+    }
+
+
+    @Override
+    public void persistSygehuse(Collection<Sygehus> entities) {
+        // TODO Auto-generated method stub
+        
+    }
 }
