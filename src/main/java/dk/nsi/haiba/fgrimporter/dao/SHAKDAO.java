@@ -30,7 +30,7 @@ import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.importer.Organisation;
 
 
-public interface HAIBADAO {
+public interface SHAKDAO {
 	
 	public void saveOrganisation(Organisation org) throws DAOException;
 	public void clearOrganisationTable() throws DAOException;

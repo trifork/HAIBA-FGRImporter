@@ -44,8 +44,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
-import dk.nsi.haiba.fgrimporter.dao.impl.HAIBADAOImpl;
+import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.parser.DirectoryInbox;
@@ -136,8 +136,8 @@ public class FGRConfiguration {
     }
 	
 	@Bean
-    public HAIBADAO haibaDao() {
-        return new HAIBADAOImpl();
+    public SHAKDAO haibaDao() {
+        return new SHAKDAOImpl();
     }
 	
 	@Bean
