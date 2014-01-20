@@ -25,129 +25,95 @@
  * SOFTWARE.
  */
 
-package dk.nsi.haiba.fgrimporter.model.xmlmodel;
+package dk.nsi.sdm4.sor.xmlmodel;
 
 import java.util.Date;
 
 
-public class OrganizationalUnit extends AddressInformation
-{
-	private Long sorIdentifier;
-	private String entityName;
-	private Long unitType;
-	private String pharmacyIdentifier;
-	private String shakIdentifier;
-	private Long specialityCode;
-	private String providerIdentifier;
-	private Date fromDate;
-	private Date toDate;
+public class OrganizationalUnit extends AddressInformation {
 
-	public OrganizationalUnit()
-	{
+    private Long sorIdentifier;
+    private String entityName;
+    private Long entityTypeIdentifier;
+    private String pharmacyIdentifier;
+    private String shakIdentifier;
+    private Long specialityIdentifier;
+    private String providerIdentifier;
+    private Date fromDate;
+    private Date toDate;
 
-	}
+    public OrganizationalUnit()
+    {}
 
-	public Long getSorIdentifier()
-	{
+    public Long getSorIdentifier() {
+        return sorIdentifier;
+    }
 
-		return sorIdentifier;
-	}
+    public void setSorIdentifier(Long sorIdentifier) {
+        this.sorIdentifier = sorIdentifier;
+    }
 
-	public void setSorIdentifier(Long sorIdentifier)
-	{
+    public String getEntityName() {
+        return entityName;
+    }
 
-		this.sorIdentifier = sorIdentifier;
-	}
+    public void setEntityName(String entityName) {
+        this.entityName = entityName;
+    }
 
-	public String getEntityName()
-	{
+    public Long getEntityTypeIdentifier() {
+        return entityTypeIdentifier;
+    }
 
-		return entityName;
-	}
+    public void setEntityTypeIdentifier(Long entityTypeIdentifier) {
+        this.entityTypeIdentifier = entityTypeIdentifier;
+    }
 
-	public void setEntityName(String entityName)
-	{
+    public String getPharmacyIdentifier() {
+        return pharmacyIdentifier;
+    }
 
-		this.entityName = entityName;
-	}
+    public void setPharmacyIdentifier(String pharmacyIdentifier) {
+        this.pharmacyIdentifier = pharmacyIdentifier;
+    }
 
-	public Long getUnitType()
-	{
+    public String getShakIdentifier() {
+        return shakIdentifier;
+    }
 
-		return unitType;
-	}
+    public void setShakIdentifier(String shakIdentifier) {
+        this.shakIdentifier = shakIdentifier;
+    }
 
-	public void setUnitType(Long unitType)
-	{
+    public Long getSpecialityIdentifier() {
+        return specialityIdentifier;
+    }
 
-		this.unitType = unitType;
-	}
+    public void setSpecialityIdentifier(Long specialityIdentifier) {
+        this.specialityIdentifier = specialityIdentifier;
+    }
 
-	public String getPharmacyIdentifier()
-	{
+    public String getProviderIdentifier() {
+        return providerIdentifier;
+    }
 
-		return pharmacyIdentifier;
-	}
+    public void setProviderIdentifier(String providerIdentifier) {
+        this.providerIdentifier = providerIdentifier;
+    }
 
-	public void setPharmacyIdentifier(String pharmacyIdentifier)
-	{
+    public Date getFromDate() {
+        return fromDate;
+    }
 
-		this.pharmacyIdentifier = pharmacyIdentifier;
-	}
+    public void setFromDate(Date validFrom) {
+        this.fromDate = validFrom;
+    }
 
-	public String getShakIdentifier()
-	{
+    public Date getToDate() {
+        return toDate;
+    }
 
-		return shakIdentifier;
-	}
-
-	public void setShakIdentifier(String shakIdentifier)
-	{
-
-		this.shakIdentifier = shakIdentifier;
-	}
-
-	public Long getSpecialityCode()
-	{
-
-		return specialityCode;
-	}
-
-	public void setSpecialityCode(Long specialityCode)
-	{
-
-		this.specialityCode = specialityCode;
-	}
-
-	public String getProviderIdentifier()
-	{
-
-		return providerIdentifier;
-	}
-
-	public void setProviderIdentifier(String providerIdentifier)
-	{
-
-		this.providerIdentifier = providerIdentifier;
-	}
-
-	public Date getFromDate()
-	{
-		return fromDate;
-	}
-
-	public void setFromDate(Date validFrom)
-	{
-		this.fromDate = validFrom;
-	}
-
-	public Date getToDate()
-	{
-		return toDate;
-	}
-
-	public void setToDate(Date toDate)
-	{
-		this.toDate = toDate;
-	}
+    public void setToDate(Date toDate) {
+        this.toDate = toDate;
+    }
 }
