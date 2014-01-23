@@ -25,7 +25,7 @@
  * SOFTWARE.
  */
 
-package dk.nsi.haiba.fgrimporter.importer;
+package dk.nsi.haiba.fgrimporter.model;
 
 import java.util.Date;
 

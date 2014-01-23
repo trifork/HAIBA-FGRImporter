@@ -27,7 +27,7 @@
 package dk.nsi.haiba.fgrimporter.dao;
 
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
-import dk.nsi.haiba.fgrimporter.importer.Organisation;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
 
 public interface SHAKDAO {
     public void saveOrganisation(Organisation org) throws DAOException;

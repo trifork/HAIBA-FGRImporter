@@ -26,8 +26,8 @@
  */
 package dk.nsi.haiba.fgrimporter.importer;
 
-import static dk.nsi.haiba.fgrimporter.importer.Organisation.InstitutionType.HOSPITAL;
-import static dk.nsi.haiba.fgrimporter.importer.Organisation.InstitutionType.HOSPITAL_DEPARTMENT;
+import static dk.nsi.haiba.fgrimporter.model.Organisation.InstitutionType.HOSPITAL;
+import static dk.nsi.haiba.fgrimporter.model.Organisation.InstitutionType.HOSPITAL_DEPARTMENT;
 
 import java.io.File;
 import java.io.IOException;
@@ -48,6 +48,7 @@ import com.google.common.base.Preconditions;
 
 import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.parser.ParserException;
 
