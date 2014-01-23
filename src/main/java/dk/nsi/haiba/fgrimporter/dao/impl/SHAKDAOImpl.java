@@ -81,7 +81,7 @@ public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
 	@Override
 	public void clearOrganisationTable() throws DAOException {
 	    try {
-			jdbc.update("TRUNCATE TABLE Organisation");
+			jdbc.update("DELETE FROM Organisation");
         } catch (Exception e) {
             throw new DAOException("", e);
         }
