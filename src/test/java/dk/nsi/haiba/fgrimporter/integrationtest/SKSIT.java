@@ -37,6 +37,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -57,8 +58,11 @@ import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 
 import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
+import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
 
 /*
  * Tests the HAIBADAO class
@@ -68,13 +72,13 @@ import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 @Transactional("haibaTransactionManager")
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class SKSIT {
-	
+
     @Configuration
     @PropertySource("classpath:test.properties")
     @Import(FGRIntegrationTestConfiguration.class)
     static class ContextConfiguration {
         @Bean
-        public SHAKDAO shakDao() {
+        public SKSDAO<Organisation> dao() {
             return new SHAKDAOImpl();
         }
 
@@ -83,43 +87,44 @@ public class SKSIT {
     @Autowired
     @Qualifier("haibaJdbcTemplate")
     JdbcTemplate jdbc;
-    
+
     @Autowired
-    SHAKDAO dao;
+    SKSDAO<Organisation> dao;
 
-	@Rule
-	public TemporaryFolder tmpDir = new TemporaryFolder();
+    @Rule
+    public TemporaryFolder tmpDir = new TemporaryFolder();
 
-	@Autowired
-	SKSParser importer;
-    
-	@Before
+    @Autowired
+    SKSParser<Organisation> shakParser;
+
+    @Before
     public void init() {
     }
 
-	@Test
-	public void canImportTheCorrectNumberOfRecords() throws Throwable {
-		importer.process(datasetDirWith("data/sks/SHAKCOMPLETE.TXT"), "");
-		
-		// FIXME: These record counts are only correct iff if duplicate keys are disregarted.
-		// This is unfortunate. Keys are currently only considered based their SKSKode.
-		// They should be a combination of type + kode + startdato based on the register doc.
-		assertEquals(745, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Sygehus'"));
-		assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Afdeling'"));
-	}
-	
+    @Test
+    public void canImportTheCorrectNumberOfRecords() throws Throwable {
+        process("data/sks/SHAKCOMPLETE.TXT");
+
+        // FIXME: These record counts are only correct iff if duplicate keys are disregarted.
+        // This is unfortunate. Keys are currently only considered based their SKSKode.
+        // They should be a combination of type + kode + startdato based on the register doc.
+        assertEquals(745, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Sygehus'"));
+        assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Afdeling'"));
+    }
+
     @Test
     public void validToAndFromInclusive() throws IOException, ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         // Rigshospitalet have the following date specified in input:
         // Valid from inclusive = 19760401
         // Valid to inclusive = 25000101
+        process("data/sks/SHAKCOMPLETE.TXT");
 
-        importer.process(datasetDirWith("data/sks/SHAKCOMPLETE.TXT"), "");
         Date validTo = jdbc.queryForObject("SELECT ValidTo FROM Organisation WHERE Navn='Rigshospitalet'", Date.class);
-        Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM Organisation WHERE Navn='Rigshospitalet'", Date.class);
+        Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM Organisation WHERE Navn='Rigshospitalet'",
+                Date.class);
 
-        Date lastValidTo = formatter.parse("2500-01-01 23:59:58"); //2500-01-02 00:00:00.0
+        Date lastValidTo = formatter.parse("2500-01-01 23:59:58"); // 2500-01-02 00:00:00.0
         Date firstInvalidTo = formatter.parse("2500-01-02 00:00:01");
         assertTrue(validTo.after(lastValidTo));
         assertTrue(validTo.before(firstInvalidTo));
@@ -132,8 +137,7 @@ public class SKSIT {
 
     @Test
     public void updatesValidToAndModifiedDate() throws IOException, InterruptedException {
-
-        importer.process(datasetDirWith("data/sks/SHAKCOMPLETE.TXT"), "");
+        process("data/sks/SHAKCOMPLETE.TXT");
         Timestamp timestamp = new Timestamp((new Date()).getTime());
         Timestamp modified1 = jdbc.queryForObject("SELECT ModifiedDate FROM Organisation LIMIT 1", Timestamp.class);
 
@@ -142,7 +146,7 @@ public class SKSIT {
 
         // Check no invalid records exist
         Thread.sleep(1000);
-        importer.process(datasetDirWith("data/sks2/SHAKCOMPLETE.TXT"), "");
+        process("data/sks2/SHAKCOMPLETE.TXT");
         timestamp = new Timestamp((new Date()).getTime());
 
         // Check some records have been invalidated
@@ -150,18 +154,30 @@ public class SKSIT {
         assertTrue(cntSecondImport > cntFirstImport);
 
         // Check modified date has changed
-        Timestamp modified2 = jdbc.queryForObject("SELECT ModifiedDate FROM Organisation ORDER BY ModifiedDate DESC LIMIT 1", Timestamp.class);
+        Timestamp modified2 = jdbc.queryForObject(
+                "SELECT ModifiedDate FROM Organisation ORDER BY ModifiedDate DESC LIMIT 1", Timestamp.class);
         assertFalse(modified1.equals(modified2));
     }
 
-    private File datasetDirWith(String filename) throws IOException {
-		File datasetDir = tmpDir.newFolder();
-		FileUtils.copyFileToDirectory(getFile(filename), datasetDir);
-		return datasetDir;
-	}
+    private void process(String string) throws IOException {
+        shakParser.process(datasetDirWith(string), "");
+        Set<Organisation> entities = shakParser.getEntities();
+        if (entities != null && !entities.isEmpty()) {
+            dao.clearTable();
+            for (Organisation t : entities) {
+                dao.saveEntity(t);
+            }
+        }
+    }
 
-	private File getFile(String filename) {
-		return toFile(getClass().getClassLoader().getResource(filename));
-	}
+    private File datasetDirWith(String filename) throws IOException {
+        File datasetDir = tmpDir.newFolder();
+        FileUtils.copyFileToDirectory(getFile(filename), datasetDir);
+        return datasetDir;
+    }
+
+    private File getFile(String filename) {
+        return toFile(getClass().getClassLoader().getResource(filename));
+    }
 
 }

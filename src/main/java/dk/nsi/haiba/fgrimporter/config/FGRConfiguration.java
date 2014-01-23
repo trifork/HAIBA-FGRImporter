@@ -45,12 +45,16 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
+import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SORDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.importer.SORImporter;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
+import dk.nsi.haiba.fgrimporter.model.SKSLine;
 import dk.nsi.haiba.fgrimporter.parser.DirectoryInbox;
 import dk.nsi.haiba.fgrimporter.parser.Inbox;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
@@ -62,8 +66,7 @@ import dk.sdsd.nsp.slalog.api.SLALogConfig;
 import dk.sdsd.nsp.slalog.api.SLALogger;
 
 /**
- * Configuration class 
- * providing the common infrastructure.
+ * Configuration class providing the common infrastructure.
  */
 @Configuration
 @EnableScheduling
@@ -76,7 +79,6 @@ public class FGRConfiguration {
     @Value("${dataDir}")
     private String dataDir;
 
-
     // this is not automatically registered, see https://jira.springsource.org/browse/SPR-8539
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
@@ -84,7 +86,9 @@ public class FGRConfiguration {
         propertySourcesPlaceholderConfigurer.setIgnoreResourceNotFound(true);
         propertySourcesPlaceholderConfigurer.setIgnoreUnresolvablePlaceholders(false);
 
-		propertySourcesPlaceholderConfigurer.setLocations(new Resource[]{new ClassPathResource("default-config.properties"), new ClassPathResource("epimibaconfig.properties")});
+        propertySourcesPlaceholderConfigurer
+                .setLocations(new Resource[] { new ClassPathResource("default-config.properties"),
+                        new ClassPathResource("epimibaconfig.properties") });
 
         return propertySourcesPlaceholderConfigurer;
     }
@@ -110,7 +114,8 @@ public class FGRConfiguration {
         return new DataSourceTransactionManager(ds);
     }
 
-	// This needs the static modifier due to https://jira.springsource.org/browse/SPR-8269. If not static, field jdbcJndiName
+    // This needs the static modifier due to https://jira.springsource.org/browse/SPR-8269. If not static, field
+    // jdbcJndiName
     // will not be set when trying to instantiate the DataSource
     @Bean
     public static CustomScopeConfigurer scopeConfigurer() {
@@ -141,8 +146,13 @@ public class FGRConfiguration {
     }
 
     @Bean
-    public SHAKDAO shakDao() {
+    public SKSDAO<Organisation> shakDao() {
         return new SHAKDAOImpl();
+    }
+
+    @Bean
+    public SKSDAO<SKSLine> sksDao() {
+        return new GenericSKSLineDAOImpl();
     }
 
     @Bean
@@ -151,8 +161,16 @@ public class FGRConfiguration {
     }
 
     @Bean
-    public Parser shakParser() {
-        return new SKSParser();
+    public SKSParser<Organisation> shakParser() {
+        return new SKSParser<Organisation>(Organisation.class, new String[] { Organisation.RECORD_TYPE_DEPARTMENT,
+                Organisation.RECORD_TYPE_HOSPITAL }, new String[] { "SHAKCOMPLETE.TXT", "SHAKDELTA.TXT" },
+                "shakimporter");
+    }
+
+    @Bean
+    public SKSParser<SKSLine> sksParser() {
+        return new SKSParser<SKSLine>(SKSLine.class, new String[] { "dia", "pro", "opr", "und" },
+                new String[] { "SKScomplete.txt" }, "sksimporter");
     }
 
     @Bean
@@ -164,7 +182,7 @@ public class FGRConfiguration {
     public Parser sorParser() {
         return new SORImporter();
     }
-    
+
     @Bean
     public SLALogger slaLogger() {
         return new SLALogConfig("Stamdata SOR-importer", "sorimporter").getSLALogger();

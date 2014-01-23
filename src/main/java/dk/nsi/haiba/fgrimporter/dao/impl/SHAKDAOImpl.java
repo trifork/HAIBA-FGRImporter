@@ -37,13 +37,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import dk.nsi.haiba.fgrimporter.dao.CommonDAO;
-import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
-import dk.nsi.haiba.fgrimporter.importer.Organisation;
 import dk.nsi.haiba.fgrimporter.log.Log;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
 
 @Transactional("haibaTransactionManager")
-public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
+public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
 
 	private static Log log = new Log(Logger.getLogger(SHAKDAOImpl.class));
 
@@ -52,7 +52,7 @@ public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
 	JdbcTemplate jdbc;
 
 	@Override
-	public void saveOrganisation(Organisation org) throws DAOException {
+	public void saveEntity(Organisation org) throws DAOException {
 
 		try {
 
@@ -62,8 +62,8 @@ public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
 			String sql = "INSERT INTO Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"+created+"', '"+created+"', ?, ?)";
 
 			Object[] args = new Object[] {
-				org.getNummer(),
-				org.getNavn(),
+				org.getCode(),
+				org.getText(),
 				org.getOrganisationstype(),
 				org.getValidFrom(),
 				org.getValidTo()
@@ -79,7 +79,7 @@ public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
 	
 
 	@Override
-	public void clearOrganisationTable() throws DAOException {
+	public void clearTable() throws DAOException {
 	    try {
 			jdbc.update("DELETE FROM Organisation");
         } catch (Exception e) {

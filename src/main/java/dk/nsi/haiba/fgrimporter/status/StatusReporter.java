@@ -38,7 +38,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
+import dk.nsi.haiba.fgrimporter.importer.SKSParser;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
 
 /*
  * This class is responsible for showing a statuspage, this page contains information about the general health of the application.
@@ -48,91 +51,95 @@ import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
 @Controller
 @Scope("request")
 public class StatusReporter {
-	
-	@Autowired
-	ImportStatusRepository statusRepo;
+    @Autowired
+    ImportStatusRepository statusRepo;
 
-	@Autowired
-	ImportExecutor importExecutor;
+    @Autowired
+    SKSParser<Organisation> shakParser;
 
-	@Value("${cron.import.job}")
-	String cron;
+    @Autowired
+    SKSDAO<Organisation> shakDao;
 
-	@Autowired 
-	private HttpServletRequest request;
-	
-	@RequestMapping(value = "/status")
-	public ResponseEntity<String> reportStatus() {
+    @Autowired
+    ImportExecutor importExecutor;
 
-		String manual = request.getParameter("manual");
-		if(manual == null || manual.trim().length() == 0) {
-			// no value set, use default set in the import executor
-			manual = ""+importExecutor.isManualOverride();
-		} else {
-			// manual flag is set on the request
-			if(manual.equalsIgnoreCase("true")) {
-				// flag is true, start the importer in a new thread
-				importExecutor.setManualOverride(true);
-		        Runnable importer = new Runnable() {
-		            public void run() {
-		            	importExecutor.doProcess();
-		            }
-		        }; 
-		        importer.run();
-			} else {
-				importExecutor.setManualOverride(false);
-			}
-		}
-		
-		HttpHeaders headers = new HttpHeaders();
-		String body = "OK";
-		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-		body = "OK";
-		
-		try {
-			if (!statusRepo.isHAIBADBAlive()) {
-				body = "HAIBA Database is _NOT_ running correctly";
-			} else if (statusRepo.isOverdue()) {
-				// last run information is applied to body later
-				body = "Is overdue";
-			} else {
-				status = HttpStatus.OK;
-			}
-		} catch (Exception e) {
-			body = e.getMessage();
-		}
+    @Value("${cron.import.job}")
+    String cron;
 
-		body += "</br>";
-		body = addLastRunInformation(body);
-		
-		body += "</br>------------------</br>";
-		
-		String url = request.getRequestURL().toString();
-		
-		body += "<a href=\""+url+"?manual=true\">Manual start importer</a>";
-		body += "</br>";
-		body += "<a href=\""+url+"?manual=false\">Scheduled start importer</a>";
-		body += "</br>";
-		if(manual.equalsIgnoreCase("true")) {
-			body += "status: MANUAL";
-		} else {
-			// default
-			body += "status: SCHEDULED - "+cron;
-		}
+    @Autowired
+    private HttpServletRequest request;
 
-		headers.setContentType(MediaType.TEXT_HTML);
-		
-		return new ResponseEntity<String>(body, headers, status);
-	}
+    @RequestMapping(value = "/status")
+    public ResponseEntity<String> reportStatus() {
+        String manual = request.getParameter("manual");
+        if (manual == null || manual.trim().length() == 0) {
+            // no value set, use default set in the import executor
+            // XXX
+            manual = "" + importExecutor.isManualOverride("shak");
+        } else {
+            // manual flag is set on the request
+            if (manual.equalsIgnoreCase("true")) {
+                // flag is true, start the importer in a new thread
+                importExecutor.setManualOverride(true);
+                Runnable importer = new Runnable() {
+                    public void run() {
+                        importExecutor.doProcess(shakDao, shakParser);
+                    }
+                };
+                importer.run();
+            } else {
+                importExecutor.setManualOverride(false);
+            }
+        }
 
-	
-	private String addLastRunInformation(String body) {
-		ImportStatus latestStatus = statusRepo.getLatestStatus();
-		if (latestStatus == null) {
-			return body + "\nLast import: Never run";
-		} else {
-			return body + "\n" + latestStatus.toString();
-		}
-	}
-	
+        HttpHeaders headers = new HttpHeaders();
+        String body = "OK";
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        body = "OK";
+
+        try {
+            if (!statusRepo.isHAIBADBAlive()) {
+                body = "HAIBA Database is _NOT_ running correctly";
+            } else if (statusRepo.isOverdue()) {
+                // last run information is applied to body later
+                body = "Is overdue";
+            } else {
+                status = HttpStatus.OK;
+            }
+        } catch (Exception e) {
+            body = e.getMessage();
+        }
+
+        body += "</br>";
+        body = addLastRunInformation(body);
+
+        body += "</br>------------------</br>";
+
+        String url = request.getRequestURL().toString();
+
+        body += "<a href=\"" + url + "?manual=true\">Manual start importer</a>";
+        body += "</br>";
+        body += "<a href=\"" + url + "?manual=false\">Scheduled start importer</a>";
+        body += "</br>";
+        if (manual.equalsIgnoreCase("true")) {
+            body += "status: MANUAL";
+        } else {
+            // default
+            body += "status: SCHEDULED - " + cron;
+        }
+
+        headers.setContentType(MediaType.TEXT_HTML);
+
+        return new ResponseEntity<String>(body, headers, status);
+    }
+
+    private String addLastRunInformation(String body) {
+        ImportStatus latestStatus = statusRepo.getLatestStatus();
+        if (latestStatus == null) {
+            return body + "\nLast import: Never run";
+        } else {
+            return body + "\n" + latestStatus.toString();
+        }
+    }
+
 }

@@ -28,95 +28,127 @@ package dk.nsi.haiba.fgrimporter.importer;
 
 import java.io.File;
 import java.util.Date;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
+import dk.nsi.haiba.fgrimporter.model.SKSLine;
 import dk.nsi.haiba.fgrimporter.parser.Inbox;
-import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 
 /*
  * Scheduled job, responsible for fetching new data from LPR, then send it to the RulesEngine for further processing
  */
 public class ImportExecutor {
-	private static Log log = new Log(Logger.getLogger(ImportExecutor.class));
+    private static Log log = new Log(Logger.getLogger(ImportExecutor.class));
 
-	private boolean manualOverride;
+    private boolean manualOverride;
 
-	@Autowired
-	ImportStatusRepository statusRepo;
-	
-	@Autowired
-	Inbox inbox;
+    @Autowired
+    ImportStatusRepository statusRepo;
 
-	@Autowired
-	Parser shakParser;
+    @Autowired
+    Inbox inbox;
 
-	@Scheduled(cron = "${cron.import.job}")
-	public void run() {
-		if(!isManualOverride()) {
-			log.debug("Running Importer: " + new Date().toString());
-			doProcess();
-		} else {
-			log.debug("Importer must be started manually");
-		}
-	}
+    @Autowired
+    SKSParser<Organisation> shakParser;
 
-	/*
-	 * Separated into its own method for testing purpose, because testing a scheduled method isn't good
-	 */
-	public void doProcess() {
-	    // TODO hent filer fra urler
-	    
-		// Fetch new records from LPR contact table
-		try {
-			statusRepo.importStartedAt(new DateTime());
+    @Autowired
+    SKSDAO<Organisation> shakDao;
 
-			if (!inbox.isLocked()) {
-				log.debug(inbox + " for parser is unlocked");
+    @Autowired
+    SKSParser<SKSLine> sksParser;
 
-				inbox.update();
-				File dataSet = inbox.top();
+    @Autowired
+    SKSDAO<SKSLine> sksDao;
 
-				if (dataSet != null) {
+    @Scheduled(cron = "${cron.shak.import.job}")
+    public void runShak() {
+        if (!isManualOverride("shak")) {
+            log.debug("Running Importer: " + new Date().toString());
+            doProcess(shakDao, shakParser);
+        } else {
+            log.debug("Importer must be started manually");
+        }
+    }
 
-					shakParser.process(dataSet, "TODO");
+    @Scheduled(cron = "${cron.sks.import.job}")
+    public void runSks() {
+        if (!isManualOverride("sks")) {
+            log.debug("Running Importer: " + new Date().toString());
+            doProcess(sksDao, sksParser);
+        } else {
+            log.debug("Importer must be started manually");
+        }
+    }
 
-					// Once the import is complete
-					// we can remove the data set
-					// from the inbox.
-					inbox.advance();
+    /*
+     * Separated into its own method for testing purpose, because testing a scheduled method isn't good
+     */
+    public <T extends SKSLine> void doProcess(SKSDAO<T> dao, SKSParser<T> parser) {
+        // TODO hent filer fra urler
 
-					statusRepo.importEndedWithSuccess(new DateTime());
-				} // if there is no data and no error, we never call store on the log item, which is okay
-			} else {
-				log.debug(inbox + " for parser is locked");
-			}
-	        
-			statusRepo.importEndedWithSuccess(new DateTime());
-			
-		} catch(Exception e) {
-			log.error("", e);
-			try {
-				inbox.lock();
-			} catch (RuntimeException lockExc) {
-				log.error("Unable to lock " + inbox, lockExc);
-			}
-			statusRepo.importEndedWithFailure(new DateTime(), e.getMessage());
-			throw new RuntimeException("runParserOnInbox  failed", e); // to make sure the transaction rolls back
-		}
-	}
+        // Fetch new records from LPR contact table
+        try {
+            statusRepo.importStartedAt(new DateTime());
 
-	public boolean isManualOverride() {
-		return manualOverride;
-	}
+            if (!inbox.isLocked()) {
+                log.debug(inbox + " for parser is unlocked");
 
-	public void setManualOverride(boolean manualOverride) {
-		this.manualOverride = manualOverride;
-	}
-	
+                inbox.update();
+                File dataSet = inbox.top();
+
+                if (dataSet != null) {
+
+                    parser.process(dataSet, "TODO");
+                    Set<T> entities = parser.getEntities();
+                    if (entities != null && !entities.isEmpty()) {
+                        dao.clearTable();
+                        for (T t : entities) {
+                            dao.saveEntity(t);
+                        }
+                    }
+
+                    // Once the import is complete
+                    // we can remove the data set
+                    // from the inbox.
+                    inbox.advance();
+
+                    statusRepo.importEndedWithSuccess(new DateTime());
+                } // if there is no data and no error, we never call store on the log item, which is okay
+            } else {
+                log.debug(inbox + " for parser is locked");
+            }
+
+            statusRepo.importEndedWithSuccess(new DateTime());
+
+        } catch (Exception e) {
+            log.error("", e);
+            try {
+                inbox.lock();
+            } catch (RuntimeException lockExc) {
+                log.error("Unable to lock " + inbox, lockExc);
+            }
+            statusRepo.importEndedWithFailure(new DateTime(), e.getMessage());
+            throw new RuntimeException("runParserOnInbox  failed", e); // to make sure the transaction rolls back
+        }
+    }
+
+    public boolean isManualOverride(String id) {
+        // XXX
+        return manualOverride;
+    }
+
+    public void setManualOverride(boolean manualOverride) {
+        // XXX id
+        this.manualOverride = manualOverride;
+    }
+
 }
