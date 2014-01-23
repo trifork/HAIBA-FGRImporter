@@ -74,7 +74,7 @@ public class SKSIT {
     @Import(FGRIntegrationTestConfiguration.class)
     static class ContextConfiguration {
         @Bean
-        public SHAKDAO haibaDao() {
+        public SHAKDAO shakDao() {
             return new SHAKDAOImpl();
         }
 
@@ -85,7 +85,7 @@ public class SKSIT {
     JdbcTemplate jdbc;
     
     @Autowired
-    SHAKDAO haibaDao;
+    SHAKDAO dao;
 
 	@Rule
 	public TemporaryFolder tmpDir = new TemporaryFolder();
@@ -96,7 +96,6 @@ public class SKSIT {
 	@Before
     public void init() {
     }
-
 
 	@Test
 	public void canImportTheCorrectNumberOfRecords() throws Throwable {
