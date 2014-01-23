@@ -56,7 +56,7 @@ public class InstitutionOwnerEntity extends InstitutionOwner
 		return healthInstitutionEntities;
 	}
 
-	public void setHealthInstitutionEntity(HealthInstitutionEntity healthInstitutionEntity)
+	public void addHealthInstitutionEntity(HealthInstitutionEntity healthInstitutionEntity)
 	{
 		healthInstitutionEntity.setInstitutionOwnerEntity(this);
 		this.healthInstitutionEntities.add(healthInstitutionEntity);

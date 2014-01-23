@@ -46,7 +46,7 @@ public class HealthInstitutionEntity extends HealthInstitution
 		return organizationalUnitEntities;
 	}
 
-	public void setOrganizationalUnitEntity(OrganizationalUnitEntity organizationalUnitEntity)
+	public void addOrganizationalUnitEntity(OrganizationalUnitEntity organizationalUnitEntity)
 	{
 		this.organizationalUnitEntities.add(organizationalUnitEntity);
 	}
@@ -60,4 +60,11 @@ public class HealthInstitutionEntity extends HealthInstitution
 	{
 		this.institutionOwnerEntity = institutionOwnerEntity;
 	}
+
+    @Override
+    public String toString() {
+        return "HealthInstitutionEntity [institutionOwnerEntity=" + institutionOwnerEntity
+                + ", organizationalUnitEntities=" + organizationalUnitEntities + ", toString()=" + super.toString()
+                + "]";
+    }
 }

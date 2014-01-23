@@ -34,7 +34,8 @@ public class HealthInstitution extends AddressInformation
 {
 	private Long sorIdentifier;
 	private String entityName;
-	private Long institutionType;
+	// formerly known as institutionType
+	private Long entityTypeIdentifier;
 	private String pharmacyIdentifier;
 	private String shakIdentifier;
 	private Date fromDate;
@@ -60,14 +61,14 @@ public class HealthInstitution extends AddressInformation
 		this.entityName = entityName;
 	}
 
-	public Long getInstitutionType()
+	public Long getEntityTypeIdentifier()
 	{
-		return institutionType;
+		return entityTypeIdentifier;
 	}
 
-	public void setInstitutionType(Long institutionType)
+	public void setEntityTypeIdentifier(Long entityTypeIdentifier)
 	{
-		this.institutionType = institutionType;
+		this.entityTypeIdentifier = entityTypeIdentifier;
 	}
 
 	public String getPharmacyIdentifier()
@@ -109,4 +110,11 @@ public class HealthInstitution extends AddressInformation
 	{
 		this.toDate = toDate;
 	}
+
+    @Override
+    public String toString() {
+        return "HealthInstitution [sorIdentifier=" + sorIdentifier + ", entityName=" + entityName
+                + ", institutionType=" + entityTypeIdentifier + ", pharmacyIdentifier=" + pharmacyIdentifier
+                + ", shakIdentifier=" + shakIdentifier + ", fromDate=" + fromDate + ", toDate=" + toDate + "]";
+    }
 }
