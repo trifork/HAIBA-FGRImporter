@@ -111,7 +111,7 @@ public class SKSParser implements Parser {
 	private static Log log = new Log(Logger.getLogger(SKSParser.class));
 
 	@Autowired
-	SHAKDAO haibaDao;
+	SHAKDAO dao;
 
 	private static final int SKS_CODE_START_INDEX = 3;
 	private static final int SKS_CODE_END_INDEX = 23;
@@ -170,13 +170,13 @@ public class SKSParser implements Parser {
 				lines = FileUtils.lineIterator(files[0], FILE_ENCODING);
 				
 				// First clear the table
-				haibaDao.clearOrganisationTable();
+				dao.clearOrganisationTable();
 				
 				// Then import
 				List<Organisation> dataset = innerParse(lines);
 				// TODO . check performance on this iteration
 				for (Organisation organisation : dataset) {
-					haibaDao.saveOrganisation(organisation);
+					dao.saveOrganisation(organisation);
 				}
 				
                 log.debug("Processed "+dataset.size()+ " lines");
