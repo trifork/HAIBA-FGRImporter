@@ -89,28 +89,4 @@ public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
             throw new DAOException("", e);
         }
 	}
-
-    @Override
-    public void clearSygehuse() {
-        jdbc.update("TRUNCATE TABLE Sygehus");
-    }
-    
-    @Override
-    public void clearSygehusAfdelinger() {
-        jdbc.update("TRUNCATE TABLE SygehusAfdeling");
-    }
-
-    @Override
-    public void persistSygehuseAfdelinger(Collection<SygehusAfdeling> entities) {
-        for (SygehusAfdeling sygehusAfdeling : entities) {
-            
-        }
-    }
-
-
-    @Override
-    public void persistSygehuse(Collection<Sygehus> entities) {
-        // TODO Auto-generated method stub
-        
-    }
 }

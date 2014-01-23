@@ -26,20 +26,11 @@
  */
 package dk.nsi.haiba.fgrimporter.dao;
 
-import java.util.Collection;
-
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.importer.Organisation;
-import dk.nsi.haiba.fgrimporter.model.Sygehus;
-import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
-
 
 public interface SHAKDAO {
-	
-	public void saveOrganisation(Organisation org) throws DAOException;
-	public void clearOrganisationTable() throws DAOException;
-    public void persistSygehuse(Collection<Sygehus> entities);
-    public void persistSygehuseAfdelinger(Collection<SygehusAfdeling> entities);
-    public void clearSygehuse();
-    public void clearSygehusAfdelinger();
+    public void saveOrganisation(Organisation org) throws DAOException;
+
+    public void clearOrganisationTable() throws DAOException;
 }
