@@ -29,6 +29,7 @@ package dk.nsi.haiba.fgrimporter.importer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -41,15 +42,14 @@ import org.xml.sax.SAXException;
 
 import com.google.common.base.Preconditions;
 
-import dk.nsi.haiba.fgrimporter.dao.HAIBADAO;
+import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.model.SORDataSets;
 import dk.nsi.haiba.fgrimporter.model.SOREventHandler;
+import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.parser.ParserException;
-import dk.nsi.sdm4.core.persistence.Persister;
 import dk.sdsd.nsp.slalog.api.SLALogItem;
 import dk.sdsd.nsp.slalog.api.SLALogger;
-
 
 /**
  * Parser for the SOR register.
@@ -57,72 +57,66 @@ import dk.sdsd.nsp.slalog.api.SLALogger;
  * SOR is an acronym for 'Sundhedsvæsenets Organisationsregister'.
  */
 public class SORImporter implements Parser {
-	private static final Logger logger = Logger.getLogger(SORImporter.class);
-
-	@Autowired
-	private SLALogger slaLogger;
+    private static final Logger logger = Logger.getLogger(SORImporter.class);
 
     @Autowired
-    HAIBADAO haibaDao;
+    private SLALogger slaLogger;
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void process(File datadirectory, String identifier) {
-		Preconditions.checkNotNull(datadirectory);
+    @Autowired
+    SORDAO dao;
 
-        SLALogItem slaLogItem = slaLogger.createLogItem(getHome()+".process", "SDM4."+getHome()+".process");
+    @SuppressWarnings("unchecked")
+    @Override
+    public void process(File datadirectory, String identifier) {
+        Preconditions.checkNotNull(datadirectory);
+
+        SLALogItem slaLogItem = slaLogger.createLogItem(getHome() + ".process", "SDM4." + getHome() + ".process");
         slaLogItem.setMessageId(identifier);
         slaLogItem.addCallParameter(Parser.SLA_INPUT_NAME, datadirectory.getAbsolutePath());
-		try {
-            // Reset transaction time before importing
-            persister.resetTransactionTime();
+        try {
             long processed = 0;
-			for (File file : datadirectory.listFiles()) {
-				MDC.put("filename", file.getName());
+            for (File file : datadirectory.listFiles()) {
+                MDC.put("filename", file.getName());
 
-				SORDataSets dataSets = parse(file);
-//				persister.persistCompleteDataset(dataSets.getPraksisDS());
-//                processed += dataSets.getPraksisDS().size();
-//				persister.persistCompleteDataset(dataSets.getYderDS());
-//                processed += dataSets.getYderDS().size();
-				haibaDao.persistSygehuse(dataSets.getSygehusDS().getEntities());
+                SORDataSets dataSets = parse(file);
+                dao.saveSygehuse(dataSets.getSygehusDS().getEntities());
                 processed += dataSets.getSygehusDS().size();
-                haibaDao.persistSygehuseAfdelinger(dataSets.getSygehusAfdelingDS().getEntities());
+                dao.saveSygehuseAfdelinger(dataSets.getSygehusAfdelingDS().getEntities());
+                Collection<SygehusAfdeling> entities = dataSets.getSygehusAfdelingDS().getEntities();
                 processed += dataSets.getSygehusAfdelingDS().size();
-//				persister.persistCompleteDataset(dataSets.getApotekDS());
-//                processed += dataSets.getApotekDS().size();
 
-				MDC.remove("filename");
-			}
-            slaLogItem.addCallParameter(Parser.SLA_RECORDS_PROCESSED_MAME, ""+processed);
-			slaLogItem.setCallResultOk();
-			slaLogItem.store();
-		} catch (Exception e) {
-			slaLogItem.setCallResultError("SORImporter failed - Cause: " + e.getMessage());
-			slaLogItem.store();
+                MDC.remove("filename");
+            }
+            slaLogItem.addCallParameter(Parser.SLA_RECORDS_PROCESSED_MAME, "" + processed);
+            slaLogItem.setCallResultOk();
+            slaLogItem.store();
+        } catch (Exception e) {
+            slaLogItem.setCallResultError("SORImporter failed - Cause: " + e.getMessage());
+            slaLogItem.store();
 
-			throw new ParserException(e);
-		}
-	}
+            throw new ParserException(e);
+        }
+    }
 
-	public static SORDataSets parse(File file) throws SAXException, ParserConfigurationException, IOException {
-		SORDataSets dataSets = new SORDataSets();
-		SOREventHandler handler = new SOREventHandler(dataSets);
-		SAXParserFactory factory = SAXParserFactory.newInstance();
+    public static SORDataSets parse(File file) throws SAXException, ParserConfigurationException, IOException {
+        SORDataSets dataSets = new SORDataSets();
+        SOREventHandler handler = new SOREventHandler(dataSets);
+        SAXParserFactory factory = SAXParserFactory.newInstance();
 
-		SAXParser parser = factory.newSAXParser();
+        SAXParser parser = factory.newSAXParser();
 
-		if (file.getName().toLowerCase().endsWith("xml")) {
-			parser.parse(file, handler);
-		} else {
-			logger.warn("Can only parse files with extension 'xml'! The file is ignored. file=" + file.getAbsolutePath());
-		}
+        if (file.getName().toLowerCase().endsWith("xml")) {
+            parser.parse(file, handler);
+        } else {
+            logger.warn("Can only parse files with extension 'xml'! The file is ignored. file="
+                    + file.getAbsolutePath());
+        }
 
-		return dataSets;
-	}
+        return dataSets;
+    }
 
-	@Override
-	public String getHome() {
-		return "sorimporter";
-	}
+    @Override
+    public String getHome() {
+        return "sorimporter";
+    }
 }
