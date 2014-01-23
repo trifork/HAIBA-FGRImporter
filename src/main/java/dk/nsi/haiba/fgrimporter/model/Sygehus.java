@@ -29,6 +29,8 @@ package dk.nsi.haiba.fgrimporter.model;
 
 import java.util.Date;
 
+import dk.nsi.haiba.fgrimporter.util.Util;
+
 public class Sygehus 
 {
 	private String navn;

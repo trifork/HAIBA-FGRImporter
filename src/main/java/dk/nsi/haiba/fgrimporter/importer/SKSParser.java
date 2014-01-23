@@ -26,31 +26,27 @@
  */
 package dk.nsi.haiba.fgrimporter.importer;
 
-import static dk.nsi.haiba.fgrimporter.model.Organisation.InstitutionType.HOSPITAL;
-import static dk.nsi.haiba.fgrimporter.model.Organisation.InstitutionType.HOSPITAL_DEPARTMENT;
+import static dk.nsi.haiba.fgrimporter.importer.Organisation.InstitutionType.HOSPITAL;
+import static dk.nsi.haiba.fgrimporter.importer.Organisation.InstitutionType.HOSPITAL_DEPARTMENT;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.base.Preconditions;
 
 import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
-import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.parser.ParserException;
+import dk.nsi.haiba.fgrimporter.util.Util;
 
 /**
  * Parser for the SKS register.
@@ -138,8 +134,6 @@ public class SKSParser implements Parser {
 	private static final int OPERATION_CODE_INDEX = 187;
 
 	private static final String FILE_ENCODING = "ISO8859-15";
-
-	private static final DateTimeFormatter dateFormat = ISODateTimeFormat.basicDate();
 
 	protected boolean validateInputStructure(File datadir) {
 		File[] input = datadir.listFiles();
@@ -244,8 +238,8 @@ public class SKSParser implements Parser {
 
 			institution.setNummer(line.substring(SKS_CODE_START_INDEX, SKS_CODE_END_INDEX).trim());
 
-			institution.setValidFrom(dateFormat.parseDateTime(line.substring(23, 31)).toDate());
-			institution.setValidTo(parseValidTo(line));
+			institution.setValidFrom(Util.parseValidFrom(line));
+			institution.setValidTo(Util.parseValidTo(line));
 
 			institution.setNavn(line.substring(CODE_TEXT_START_INDEX, CODE_TEXT_END_INDEX).trim());
 
@@ -257,13 +251,5 @@ public class SKSParser implements Parser {
 		}
 	}
 
-    private Date parseValidTo(String line) {
-        // ValidTo is inclusive
-        Date validToInc = dateFormat.parseDateTime(line.substring(39, 47)).toDate();
-        Calendar c = Calendar.getInstance();
-        c.setTime(validToInc);
-        // Add a day because validTo day is inclusive
-        c.add(Calendar.DATE, 1);
-        return c.getTime();
-    }
+
 }

@@ -34,7 +34,6 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.parser.Inbox;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
@@ -44,13 +43,9 @@ import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
  * Scheduled job, responsible for fetching new data from LPR, then send it to the RulesEngine for further processing
  */
 public class ImportExecutor {
-	
 	private static Log log = new Log(Logger.getLogger(ImportExecutor.class));
 
 	private boolean manualOverride;
-	
-	@Autowired
-	SHAKDAO dao;
 
 	@Autowired
 	ImportStatusRepository statusRepo;

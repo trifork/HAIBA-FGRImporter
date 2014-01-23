@@ -24,18 +24,68 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package dk.nsi.haiba.fgrimporter.model;
 
-import java.util.Calendar;
+package dk.nsi.haiba.fgrimporter.importer;
+
 import java.util.Date;
 
-public class Util {
-    public static final Date THE_END_OF_TIME = toDate(2999, 12, 31);
+public class Organisation {
+	private Date validFrom;
+	private Date validTo;
 
-    public static Date toDate(int year, int month, int date) {
-        Calendar cal = Calendar.getInstance();
-        cal.clear();
-        cal.set(year, month - 1, date);
-        return cal.getTime();
-    }
+	private String navn;
+	private String nummer;
+
+	private final InstitutionType type;
+
+	public enum InstitutionType {
+		HOSPITAL_DEPARTMENT, HOSPITAL
+	}
+
+	public Organisation(InstitutionType organisationstype) {
+		this.type = organisationstype;
+	}
+
+	public Date getValidTo() {
+		return validTo;
+	}
+
+	public void setValidTo(Date validTo) {
+		this.validTo = validTo;
+	}
+
+	public String getNavn() {
+		return navn;
+	}
+
+	public void setNavn(String navn) {
+		this.navn = navn;
+	}
+
+	public String getNummer() {
+		return nummer;
+	}
+
+	public void setNummer(String nummer) {
+		this.nummer = nummer;
+	}
+
+	public String getOrganisationstype() {
+		if (type == InstitutionType.HOSPITAL_DEPARTMENT) {
+			return "Afdeling";
+		} else if (type == InstitutionType.HOSPITAL) {
+			return "Sygehus";
+		}
+
+		return null;
+	}
+
+	public void setValidFrom(Date validFrom) {
+		this.validFrom = validFrom;
+	}
+
+	public Date getValidFrom() {
+		return validFrom;
+	}
+	
 }

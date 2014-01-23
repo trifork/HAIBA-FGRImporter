@@ -24,68 +24,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package dk.nsi.haiba.fgrimporter.util;
 
-package dk.nsi.haiba.fgrimporter.model;
-
+import java.util.Calendar;
 import java.util.Date;
 
-public class Organisation {
-	private Date validFrom;
-	private Date validTo;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 
-	private String navn;
-	private String nummer;
+public class Util {
+    public static final Date THE_END_OF_TIME = toDate(2999, 12, 31);
+    private static final DateTimeFormatter dateFormat = ISODateTimeFormat.basicDate();
 
-	private final InstitutionType type;
+    public static Date toDate(int year, int month, int date) {
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.set(year, month - 1, date);
+        return cal.getTime();
+    }
 
-	public enum InstitutionType {
-		HOSPITAL_DEPARTMENT, HOSPITAL
-	}
+    public static Date parseValidTo(String line) {
+        // ValidTo is inclusive
+        Date validToInc = dateFormat.parseDateTime(line.substring(39, 47)).toDate();
+        Calendar c = Calendar.getInstance();
+        c.setTime(validToInc);
+        // Add a day because validTo day is inclusive
+        c.add(Calendar.DATE, 1);
+        return c.getTime();
+    }
 
-	public Organisation(InstitutionType organisationstype) {
-		this.type = organisationstype;
-	}
-
-	public Date getValidTo() {
-		return validTo;
-	}
-
-	public void setValidTo(Date validTo) {
-		this.validTo = validTo;
-	}
-
-	public String getNavn() {
-		return navn;
-	}
-
-	public void setNavn(String navn) {
-		this.navn = navn;
-	}
-
-	public String getNummer() {
-		return nummer;
-	}
-
-	public void setNummer(String nummer) {
-		this.nummer = nummer;
-	}
-
-	public String getOrganisationstype() {
-		if (type == InstitutionType.HOSPITAL_DEPARTMENT) {
-			return "Afdeling";
-		} else if (type == InstitutionType.HOSPITAL) {
-			return "Sygehus";
-		}
-
-		return null;
-	}
-
-	public void setValidFrom(Date validFrom) {
-		this.validFrom = validFrom;
-	}
-
-	public Date getValidFrom() {
-		return validFrom;
-	}
-	
+    public static Date parseValidFrom(String line) {
+        return dateFormat.parseDateTime(line.substring(23, 31)).toDate();
+    }
 }

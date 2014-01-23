@@ -31,6 +31,8 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
+import dk.nsi.haiba.fgrimporter.util.Util;
+
 public class SygehusAfdeling 
 {
 	private String navn;

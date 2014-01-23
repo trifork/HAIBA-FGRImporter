@@ -39,8 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 import dk.nsi.haiba.fgrimporter.dao.CommonDAO;
 import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
+import dk.nsi.haiba.fgrimporter.importer.Organisation;
 import dk.nsi.haiba.fgrimporter.log.Log;
-import dk.nsi.haiba.fgrimporter.model.Organisation;
 
 @Transactional("haibaTransactionManager")
 public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {
