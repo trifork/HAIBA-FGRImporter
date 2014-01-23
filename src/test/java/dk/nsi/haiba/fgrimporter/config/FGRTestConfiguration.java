@@ -35,6 +35,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import dk.sdsd.nsp.slalog.api.SLALogger;
+
 @Configuration
 @EnableTransactionManagement
 @PropertySource("test.properties")
@@ -45,4 +47,8 @@ public class FGRTestConfiguration extends FGRConfiguration {
         return mock(DataSource.class);
     }
 
+    @Bean
+    public SLALogger slaLogger() {
+        return mock(SLALogger.class);
+    }
 }
