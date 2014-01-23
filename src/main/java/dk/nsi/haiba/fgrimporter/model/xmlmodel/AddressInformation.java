@@ -24,8 +24,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-package dk.nsi.sdm4.sor.xmlmodel;
+package dk.nsi.haiba.fgrimporter.model.xmlmodel;
 
 public class AddressInformation
 {
