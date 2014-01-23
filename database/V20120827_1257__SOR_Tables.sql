@@ -1,4 +1,4 @@
- CREATE TABLE IF NOT EXISTS Sygehus (
+ CREATE TABLE IF NOT EXISTS SORSygehus (
 	SygeHusPID BIGINT(20) AUTO_INCREMENT NOT NULL PRIMARY KEY,
 
 	SorNummer BIGINT(20) NOT NULL,
@@ -13,16 +13,12 @@
 	Email VARCHAR(100),
 	Www VARCHAR(100),
 
-	CreatedDate DATETIME NOT NULL,
-	ModifiedDate DATETIME NOT NULL,
 	ValidFrom DATETIME NOT NULL,
-	ValidTo DATETIME NOT NULL,
+	ValidTo DATETIME NOT NULL
 
-	INDEX (SygeHusPID, ModifiedDate),
-	INDEX (SorNummer, ValidTo, ValidFrom)
 ) ENGINE=InnoDB COLLATE=utf8_bin;
 
- CREATE TABLE IF NOT EXISTS SygehusAfdeling (
+ CREATE TABLE IF NOT EXISTS SORSygehusAfdeling (
 	SygeHusAfdelingPID BIGINT(20) AUTO_INCREMENT NOT NULL PRIMARY KEY,
 
 	SorNummer BIGINT(20) NOT NULL,
@@ -44,13 +40,9 @@
 	Email VARCHAR(100),
 	Www VARCHAR(100),
 
-	CreatedDate DATETIME NOT NULL,
-	ModifiedDate DATETIME NOT NULL,
 	ValidFrom DATETIME NOT NULL,
-	ValidTo DATETIME NOT NULL,
+	ValidTo DATETIME NOT NULL
 
-	INDEX (SygeHusAfdelingPID, ModifiedDate),
-	INDEX (SorNummer, ValidTo, ValidFrom)
 ) ENGINE=InnoDB COLLATE=utf8_bin;
 
 -- following is present in code, but unused
