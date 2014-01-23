@@ -25,24 +25,25 @@
  * SOFTWARE.
  */
 
-package dk.nsi.sdm4.sor;
-
-import dk.nsi.sdm4.core.domain.CompleteDataset;
-import dk.nsi.sdm4.core.util.Dates;
-import dk.nsi.sdm4.sor.model.*;
-import dk.nsi.sdm4.sor.xmlmodel.AddressInformation;
-import dk.nsi.sdm4.sor.xmlmodel.HealthInstitutionEntity;
-import dk.nsi.sdm4.sor.xmlmodel.InstitutionOwnerEntity;
-import dk.nsi.sdm4.sor.xmlmodel.OrganizationalUnitEntity;
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
+package dk.nsi.haiba.fgrimporter.model;
 
 import java.lang.reflect.Method;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import dk.nsi.haiba.fgrimporter.model.xmlmodel.AddressInformation;
+import dk.nsi.haiba.fgrimporter.model.xmlmodel.HealthInstitutionEntity;
+import dk.nsi.haiba.fgrimporter.model.xmlmodel.InstitutionOwnerEntity;
+import dk.nsi.haiba.fgrimporter.model.xmlmodel.OrganizationalUnitEntity;
+import dk.nsi.haiba.fgrimporter.model.xmlmodel.XMLModelMapper;
+import dk.nsi.sdm4.core.domain.CompleteDataset;
+import dk.nsi.sdm4.core.util.Dates;
 
 
 public class SOREventHandler extends DefaultHandler
@@ -62,9 +63,6 @@ public class SOREventHandler extends DefaultHandler
     }
 
     private void createDatasets(Date snapshotDate) {
-        dataSets.setApotekDS(new CompleteDataset<Apotek>(Apotek.class, snapshotDate, Dates.THE_END_OF_TIME));
-        dataSets.setYderDS(new CompleteDataset<Yder>(Yder.class, snapshotDate, Dates.THE_END_OF_TIME));
-        dataSets.setPraksisDS(new CompleteDataset<Praksis>(Praksis.class, snapshotDate, Dates.THE_END_OF_TIME));
         dataSets.setSygehusDS(new CompleteDataset<Sygehus>(Sygehus.class, snapshotDate, Dates.THE_END_OF_TIME));
         dataSets.setSygehusAfdelingDS(new CompleteDataset<SygehusAfdeling>(SygehusAfdeling.class, snapshotDate, Dates.THE_END_OF_TIME));
     }
@@ -82,7 +80,7 @@ public class SOREventHandler extends DefaultHandler
             if (curOUE == null) {
                 // Father is a HealthInstitutionEntity
                 curOUE = new OrganizationalUnitEntity(null);
-                curHIE.setOrganizationalUnitEntity(curOUE);
+                curHIE.addOrganizationalUnitEntity(curOUE);
                 curOUE.setHealthInstitutionEntity(curHIE);
             } else {
                 // Father is a OrganizationalUnitEntity
@@ -112,22 +110,6 @@ public class SOREventHandler extends DefaultHandler
             for (HealthInstitutionEntity institutuinEntity : curIOE.getHealthInstitutionEntity()) {
                 if (institutuinEntity.getEntityTypeIdentifier() == 394761003L || institutuinEntity.getEntityTypeIdentifier() == 550671000005100L) {
                     // Lægepraksis og special læger.
-                    Praksis praksis = XMLModelMapper.toPraksis(institutuinEntity);
-                    for (OrganizationalUnitEntity oue : institutuinEntity.getOrganizationalUnitEntities()) {
-                        // Yder for Lægepraksis.
-                        Yder yder = XMLModelMapper.toYder(oue, institutuinEntity.getSorIdentifier());
-                        dataSets.getYderDS().add(yder);
-                        // This der er level 2 OrganizationalUnitEntity så håndter dette her
-                        for (OrganizationalUnitEntity suboue : oue.getSons()) {
-                            yder = XMLModelMapper.toYder(suboue, institutuinEntity.getSorIdentifier());
-                            dataSets.getYderDS().add(yder);
-                            if (!suboue.getSons().isEmpty()) {
-                                throw new SAXException("Lægepraksis skal ikke have en level 3 OrganizationalUnitEntity. SORId=" +
-                                        suboue.getSorIdentifier() + " har!!");
-                            }
-                        }
-                    }
-                    dataSets.getPraksisDS().add(praksis);
                 } else if (institutuinEntity.getEntityTypeIdentifier() == 22232009L) {
                     // Sygehus.
                     Sygehus s = XMLModelMapper.toSygehus(institutuinEntity);
@@ -138,10 +120,6 @@ public class SOREventHandler extends DefaultHandler
                     dataSets.getSygehusDS().add(s);
                 } else if (institutuinEntity.getEntityTypeIdentifier() == 264372000L) {
                     // Apotek.
-                    for (OrganizationalUnitEntity oue : institutuinEntity.getOrganizationalUnitEntities()) {
-                        Apotek a = XMLModelMapper.toApotek(oue);
-                        dataSets.getApotekDS().add(a);
-                    }
                 }
             }
 
