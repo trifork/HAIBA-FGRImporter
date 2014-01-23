@@ -27,31 +27,19 @@
 
 package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.sdm4.core.domain.CompleteDataset;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
+public class SORDataSets {
+    private Set<Sygehus> sygehusDS = new HashSet<Sygehus>();
+    private Set<SygehusAfdeling> sygehusAfdelingDS = new HashSet<SygehusAfdeling>();
 
-public class SORDataSets
-{
-	private CompleteDataset<Sygehus> sygehusDS;
-	private CompleteDataset<SygehusAfdeling> sygehusAfdelingDS;
+    public Collection<Sygehus> getSygehusDS() {
+        return sygehusDS;
+    }
 
-	public CompleteDataset<Sygehus> getSygehusDS()
-	{
-		return sygehusDS;
-	}
-
-	public void setSygehusDS(CompleteDataset<Sygehus> sygehusDS)
-	{
-		this.sygehusDS = sygehusDS;
-	}
-
-	public CompleteDataset<SygehusAfdeling> getSygehusAfdelingDS()
-	{
-		return sygehusAfdelingDS;
-	}
-
-	public void setSygehusAfdelingDS(CompleteDataset<SygehusAfdeling> sygehusAfdelingDS)
-	{
-		this.sygehusAfdelingDS = sygehusAfdelingDS;
-	}
+    public Collection<SygehusAfdeling> getSygehusAfdelingDS() {
+        return sygehusAfdelingDS;
+    }
 }

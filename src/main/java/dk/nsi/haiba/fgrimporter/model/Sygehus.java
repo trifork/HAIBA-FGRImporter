@@ -27,16 +27,11 @@
 
 package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.sdm4.core.domain.AbstractStamdataEntity;
-import dk.nsi.sdm4.core.util.Dates;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.Date;
 
-@Entity
-public class Sygehus extends AbstractStamdataEntity
+import dk.nsi.sdm4.core.util.Dates;
+
+public class Sygehus 
 {
 	private String navn;
 	private Long eanLokationsnummer;
@@ -51,7 +46,6 @@ public class Sygehus extends AbstractStamdataEntity
 	private Date validFrom;
 	private Date validTo;
 
-	@Column
 	public String getNavn()
 	{
 		return navn;
@@ -62,7 +56,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.navn = navn;
 	}
 
-	@Column
 	public Long getEanLokationsnummer()
 	{
 		return eanLokationsnummer;
@@ -73,7 +66,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.eanLokationsnummer = eanLokationsnummer;
 	}
 
-	@Column
 	public String getNummer()
 	{
 		return nummer;
@@ -84,7 +76,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.nummer = nummer;
 	}
 
-	@Column
 	public String getTelefon()
 	{
 		return telefon;
@@ -95,7 +86,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.telefon = telefon;
 	}
 
-	@Column
 	public String getVejnavn()
 	{
 		return vejnavn;
@@ -106,7 +96,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.vejnavn = vejnavn;
 	}
 
-	@Column
 	public String getPostnummer()
 	{
 		return postnummer;
@@ -117,7 +106,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.postnummer = postnummer;
 	}
 
-	@Column
 	public String getBynavn()
 	{
 		return bynavn;
@@ -128,7 +116,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.bynavn = bynavn;
 	}
 
-	@Column
 	public String getEmail()
 	{
 		return email;
@@ -139,7 +126,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.email = email;
 	}
 
-	@Column
 	public String getWww()
 	{
 		return www;
@@ -150,8 +136,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.www = www;
 	}
 
-	@Id
-	@Column
 	public Long getSorNummer()
 	{
 		return sorNummer;
@@ -162,7 +146,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.sorNummer = sorNummer;
 	}
 
-	@Override
 	public Date getValidFrom()
 	{
 		return validFrom;
@@ -174,7 +157,6 @@ public class Sygehus extends AbstractStamdataEntity
 		this.validFrom = validFrom;
 	}
 
-	@Override
 	public Date getValidTo()
 	{
 		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
@@ -184,4 +166,30 @@ public class Sygehus extends AbstractStamdataEntity
 	{
 		this.validTo = validTo;
 	}
+	
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((sorNummer == null) ? 0 : sorNummer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Sygehus other = (Sygehus) obj;
+        if (sorNummer == null) {
+            if (other.sorNummer != null)
+                return false;
+        } else if (!sorNummer.equals(other.sorNummer))
+            return false;
+        return true;
+    }
 }

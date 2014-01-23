@@ -42,8 +42,6 @@ import dk.nsi.haiba.fgrimporter.model.xmlmodel.HealthInstitutionEntity;
 import dk.nsi.haiba.fgrimporter.model.xmlmodel.InstitutionOwnerEntity;
 import dk.nsi.haiba.fgrimporter.model.xmlmodel.OrganizationalUnitEntity;
 import dk.nsi.haiba.fgrimporter.model.xmlmodel.XMLModelMapper;
-import dk.nsi.sdm4.core.domain.CompleteDataset;
-import dk.nsi.sdm4.core.util.Dates;
 
 
 public class SOREventHandler extends DefaultHandler
@@ -60,11 +58,6 @@ public class SOREventHandler extends DefaultHandler
 
     public SOREventHandler(SORDataSets dataSets) {
         this.dataSets = dataSets;
-    }
-
-    private void createDatasets(Date snapshotDate) {
-        dataSets.setSygehusDS(new CompleteDataset<Sygehus>(Sygehus.class, snapshotDate, Dates.THE_END_OF_TIME));
-        dataSets.setSygehusAfdelingDS(new CompleteDataset<SygehusAfdeling>(SygehusAfdeling.class, snapshotDate, Dates.THE_END_OF_TIME));
     }
 
     @Override
@@ -99,13 +92,7 @@ public class SOREventHandler extends DefaultHandler
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if ("sor1:SnapshotDate".equals(qName)) {
-            try {
-                createDatasets(parseXSDDate(elementValue));
-            } catch (ParseException e) {
-                throw new SAXException(e);
-            }
-        } else if ("InstitutionOwnerEntity".equals(qName)) {
+        if ("InstitutionOwnerEntity".equals(qName)) {
             denormalizeAdress(curIOE);
             for (HealthInstitutionEntity institutuinEntity : curIOE.getHealthInstitutionEntity()) {
                 if (institutuinEntity.getEntityTypeIdentifier() == 394761003L || institutuinEntity.getEntityTypeIdentifier() == 550671000005100L) {

@@ -29,17 +29,11 @@ package dk.nsi.haiba.fgrimporter.model;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
 import org.apache.log4j.Logger;
 
-import dk.nsi.sdm4.core.domain.AbstractStamdataEntity;
 import dk.nsi.sdm4.core.util.Dates;
 
-@Entity(name = "Apotek")
-public class Apotek extends AbstractStamdataEntity
+public class Apotek 
 {
 	private Long sorNummer;
 	private Long apotekNummer;
@@ -62,8 +56,6 @@ public class Apotek extends AbstractStamdataEntity
 	{
 	}
 
-	@Id
-	@Column
 	public Long getSorNummer()
 	{
 		return sorNummer;
@@ -74,7 +66,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.sorNummer = sorNummer;
 	}
 
-	@Column
 	public Long getApotekNummer()
 	{
 		return apotekNummer;
@@ -85,7 +76,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.apotekNummer = apotekNummer;
 	}
 
-	@Column
 	public Long getFilialNummer()
 	{
 		return filialNummer;
@@ -96,7 +86,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.filialNummer = filialNummer;
 	}
 
-	@Column
 	public Long getEanLokationsnummer()
 	{
 		return eanLokationsnummer;
@@ -107,7 +96,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.eanLokationsnummer = eanLokationsnummer;
 	}
 
-	@Column
 	public Long getCvr()
 	{
 		return cvr;
@@ -118,7 +106,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.cvr = cvr;
 	}
 
-	@Column
 	public Long getPcvr()
 	{
 		return pcvr;
@@ -129,7 +116,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.pcvr = pcvr;
 	}
 
-	@Column
 	public String getNavn()
 	{
 		return navn;
@@ -140,7 +126,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.navn = navn;
 	}
 
-	@Column
 	public String getTelefon()
 	{
 		return telefon;
@@ -151,7 +136,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.telefon = telefon;
 	}
 
-	@Column
 	public String getVejnavn()
 	{
 		return vejnavn;
@@ -162,7 +146,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.vejnavn = vejnavn;
 	}
 
-	@Column
 	public String getPostnummer()
 	{
 		return postnummer;
@@ -173,7 +156,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.postnummer = postnummer;
 	}
 
-	@Column
 	public String getBynavn()
 	{
 		return bynavn;
@@ -184,7 +166,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.bynavn = bynavn;
 	}
 
-	@Column
 	public String getEmail()
 	{
 		return email;
@@ -195,7 +176,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.email = email;
 	}
 
-	@Column
 	public String getWww()
 	{
 		return www;
@@ -206,7 +186,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.www = www;
 	}
 
-	@Override
 	public Date getValidFrom()
 	{
 		return validFrom;
@@ -217,7 +196,6 @@ public class Apotek extends AbstractStamdataEntity
 		this.validFrom = validFrom;
 	}
 
-	@Override
 	public Date getValidTo()
 	{
 		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
@@ -227,4 +205,29 @@ public class Apotek extends AbstractStamdataEntity
 	{
 		this.validTo = validTo;
 	}
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((sorNummer == null) ? 0 : sorNummer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Apotek other = (Apotek) obj;
+        if (sorNummer == null) {
+            if (other.sorNummer != null)
+                return false;
+        } else if (!sorNummer.equals(other.sorNummer))
+            return false;
+        return true;
+    }
 }

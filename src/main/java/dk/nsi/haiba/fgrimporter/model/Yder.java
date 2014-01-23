@@ -27,199 +27,173 @@
 
 package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.sdm4.core.domain.AbstractStamdataEntity;
 import dk.nsi.sdm4.core.domain.TemporalEntity;
 import dk.nsi.sdm4.core.util.Dates;
+
 import org.apache.log4j.Logger;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.Date;
 
-@Entity(name = "Yder")
-public class Yder extends AbstractStamdataEntity implements TemporalEntity
-{
-	private String nummer;
-	private Long eanLokationsnummer;
-	private String telefon;
-	private String navn;
-	private String vejnavn;
-	private String postnummer;
-	private String bynavn;
-	private String email;
-	private String www;
-	private Long hovedSpecialeKode;
-	private String hovedSpecialeTekst;
-	private Long sorNummer;
-	private Long praktisSorNummer;
-	private Date validFrom;
-	private Date validTo;
+public class Yder {
+    private String nummer;
+    private Long eanLokationsnummer;
+    private String telefon;
+    private String navn;
+    private String vejnavn;
+    private String postnummer;
+    private String bynavn;
+    private String email;
+    private String www;
+    private Long hovedSpecialeKode;
+    private String hovedSpecialeTekst;
+    private Long sorNummer;
+    private Long praktisSorNummer;
+    private Date validFrom;
+    private Date validTo;
     private static final Logger logger = Logger.getLogger(Yder.class);
 
-	@Column
-	public String getNummer()
-	{
-		return nummer;
-	}
+    public String getNummer() {
+        return nummer;
+    }
 
-	public void setNummer(String nummer)
-	{
-		this.nummer = nummer;
-	}
+    public void setNummer(String nummer) {
+        this.nummer = nummer;
+    }
 
-	@Column
-	public Long getEanLokationsnummer()
-	{
-		return eanLokationsnummer;
-	}
+    public Long getEanLokationsnummer() {
+        return eanLokationsnummer;
+    }
 
-	public void setEanLokationsnummer(Long eanLokationsnummer)
-	{
-		this.eanLokationsnummer = eanLokationsnummer;
-	}
+    public void setEanLokationsnummer(Long eanLokationsnummer) {
+        this.eanLokationsnummer = eanLokationsnummer;
+    }
 
-	@Column
-	public String getTelefon()
-	{
-		return telefon;
-	}
+    public String getTelefon() {
+        return telefon;
+    }
 
-	public void setTelefon(String telefon)
-	{
-		this.telefon = telefon;
-	}
+    public void setTelefon(String telefon) {
+        this.telefon = telefon;
+    }
 
-	@Column
-	public String getNavn()
-	{
-		return navn;
-	}
+    public String getNavn() {
+        return navn;
+    }
 
-	public void setNavn(String navn)
-	{
-		this.navn = navn;
-	}
+    public void setNavn(String navn) {
+        this.navn = navn;
+    }
 
-	@Column
-	public String getVejnavn()
-	{
-		return vejnavn;
-	}
+    public String getVejnavn() {
+        return vejnavn;
+    }
 
-	public void setVejnavn(String vejnavn)
-	{
-		this.vejnavn = vejnavn;
-	}
+    public void setVejnavn(String vejnavn) {
+        this.vejnavn = vejnavn;
+    }
 
-	@Column
-	public String getPostnummer()
-	{
-		return postnummer;
-	}
+    public String getPostnummer() {
+        return postnummer;
+    }
 
-	public void setPostnummer(String postnummer)
-	{
-		this.postnummer = postnummer;
-	}
+    public void setPostnummer(String postnummer) {
+        this.postnummer = postnummer;
+    }
 
-	@Column
-	public String getBynavn()
-	{
-		return bynavn;
-	}
+    public String getBynavn() {
+        return bynavn;
+    }
 
-	public void setBynavn(String bynavn)
-	{
-		this.bynavn = bynavn;
-	}
+    public void setBynavn(String bynavn) {
+        this.bynavn = bynavn;
+    }
 
-	@Column
-	public String getEmail()
-	{
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email)
-	{
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	@Column
-	public String getWww()
-	{
-		return www;
-	}
+    public String getWww() {
+        return www;
+    }
 
-	public void setWww(String www)
-	{
-		this.www = www;
-	}
+    public void setWww(String www) {
+        this.www = www;
+    }
 
-	@Column
-	public Long getHovedSpecialeKode()
-	{
-		return hovedSpecialeKode;
-	}
+    public Long getHovedSpecialeKode() {
+        return hovedSpecialeKode;
+    }
 
-	public void setHovedSpecialeKode(Long hovedSpecialeKode)
-	{
-		this.hovedSpecialeKode = hovedSpecialeKode;
-	}
+    public void setHovedSpecialeKode(Long hovedSpecialeKode) {
+        this.hovedSpecialeKode = hovedSpecialeKode;
+    }
 
-	@Column
-	public String getHovedSpecialeTekst()
-	{
-		return hovedSpecialeTekst;
-	}
+    public String getHovedSpecialeTekst() {
+        return hovedSpecialeTekst;
+    }
 
-	public void setHovedSpecialeTekst(String hovedSpecialeTekst)
-	{
-		this.hovedSpecialeTekst = hovedSpecialeTekst;
-	}
+    public void setHovedSpecialeTekst(String hovedSpecialeTekst) {
+        this.hovedSpecialeTekst = hovedSpecialeTekst;
+    }
 
-	@Id
-	@Column
-	public Long getSorNummer()
-	{
-		return sorNummer;
-	}
+    public Long getSorNummer() {
+        return sorNummer;
+    }
 
-	public void setSorNummer(Long sorNummer)
-	{
-		this.sorNummer = sorNummer;
-	}
+    public void setSorNummer(Long sorNummer) {
+        this.sorNummer = sorNummer;
+    }
 
-	@Column
-	public Long getPraksisSorNummer()
-	{
-		return praktisSorNummer;
-	}
+    public Long getPraksisSorNummer() {
+        return praktisSorNummer;
+    }
 
-	public void setPraksisSorNummer(Long praktisSorNummer)
-	{
-		this.praktisSorNummer = praktisSorNummer;
-	}
+    public void setPraksisSorNummer(Long praktisSorNummer) {
+        this.praktisSorNummer = praktisSorNummer;
+    }
 
-	@Override
-	public Date getValidFrom()
-	{
-		return validFrom;
-	}
+    public Date getValidFrom() {
+        return validFrom;
+    }
 
-	public void setValidFrom(Date validFrom)
-	{
-		this.validFrom = validFrom;
-	}
+    public void setValidFrom(Date validFrom) {
+        this.validFrom = validFrom;
+    }
 
-	@Override
-	public Date getValidTo()
-	{
-		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
-	}
+    public Date getValidTo() {
+        return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
+    }
 
-	public void setValidTo(Date validTo)
-	{
-		this.validTo = validTo;
-	}
+    public void setValidTo(Date validTo) {
+        this.validTo = validTo;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((sorNummer == null) ? 0 : sorNummer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Yder other = (Yder) obj;
+        if (sorNummer == null) {
+            if (other.sorNummer != null)
+                return false;
+        } else if (!sorNummer.equals(other.sorNummer))
+            return false;
+        return true;
+    }
 }

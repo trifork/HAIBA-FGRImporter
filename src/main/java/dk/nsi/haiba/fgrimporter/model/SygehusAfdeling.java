@@ -27,17 +27,17 @@
 
 package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.sdm4.core.domain.AbstractStamdataEntity;
 import dk.nsi.sdm4.core.util.Dates;
+
 import org.apache.log4j.Logger;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
 import java.util.Date;
 
-@Entity
-public class SygehusAfdeling extends AbstractStamdataEntity
+public class SygehusAfdeling 
 {
 	private String navn;
 	private Long eanLokationsnummer;
@@ -60,7 +60,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 	private Date validTo;
     private static final Logger logger = Logger.getLogger(SygehusAfdeling.class);
 
-	@Column
 	public String getNavn()
 	{
 		return navn;
@@ -71,7 +70,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.navn = navn;
 	}
 
-	@Column
 	public Long getEanLokationsnummer()
 	{
 		return eanLokationsnummer;
@@ -82,7 +80,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.eanLokationsnummer = eanLokationsnummer;
 	}
 
-	@Column
 	public String getNummer()
 	{
 		return nummer;
@@ -93,7 +90,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.nummer = nummer;
 	}
 
-	@Column
 	public String getTelefon()
 	{
 		return telefon;
@@ -104,7 +100,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.telefon = telefon;
 	}
 
-	@Column
 	public String getVejnavn()
 	{
 		return vejnavn;
@@ -115,7 +110,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.vejnavn = vejnavn;
 	}
 
-	@Column
 	public String getPostnummer()
 	{
 		return postnummer;
@@ -126,7 +120,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.postnummer = postnummer;
 	}
 
-	@Column
 	public String getBynavn()
 	{
 		return bynavn;
@@ -137,7 +130,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.bynavn = bynavn;
 	}
 
-	@Column
 	public String getEmail()
 	{
 		return email;
@@ -148,7 +140,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.email = email;
 	}
 
-	@Column
 	public String getWww()
 	{
 		return www;
@@ -159,7 +150,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.www = www;
 	}
 
-	@Column
 	public Long getAfdelingTypeKode()
 	{
 		return afdelingTypeKode;
@@ -170,7 +160,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.afdelingTypeKode = afdelingTypeKode;
 	}
 
-	@Column
 	public Long getHovedSpecialeKode()
 	{
 		return hovedSpecialeKode;
@@ -181,7 +170,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.hovedSpecialeKode = hovedSpecialeKode;
 	}
 
-	@Column
 	public String getHovedSpecialeTekst()
 	{
 		return hovedSpecialeTekst;
@@ -192,7 +180,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.hovedSpecialeTekst = hovedSpecialeTekst;
 	}
 
-	@Column
 	public String getAfdelingTypeTekst()
 	{
 		return afdelingTypeTekst;
@@ -203,8 +190,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.afdelingTypeTekst = afdelingTypeTekst;
 	}
 
-	@Id
-	@Column
 	public Long getSorNummer()
 	{
 		return sorNummer;
@@ -215,7 +200,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.sorNummer = sorNummer;
 	}
 
-	@Column
 	public Long getSygehusSorNummer()
 	{
 		return sygehusSorNummer;
@@ -226,7 +210,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.sygehusSorNummer = sygehusSorNummer;
 	}
 
-	@Column
 	public Long getOverAfdelingSorNummer()
 	{
 
@@ -238,7 +221,6 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.overAfdelingSorNummer = overAfdelingSorNummer;
 	}
 
-	@Column
 	public Long getUnderlagtSygehusSorNummer()
 	{
 		return underlagtSygehusSorNummer;
@@ -254,13 +236,11 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 		this.validFrom = validFrom;
 	}
 
-	@Override
 	public Date getValidFrom()
 	{
 		return validFrom;
 	}
 
-	@Override
 	public Date getValidTo()
 	{
 		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
@@ -270,4 +250,30 @@ public class SygehusAfdeling extends AbstractStamdataEntity
 	{
 		this.validTo = validTo;
 	}
+	
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((sorNummer == null) ? 0 : sorNummer.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        SygehusAfdeling other = (SygehusAfdeling) obj;
+        if (sorNummer == null) {
+            if (other.sorNummer != null)
+                return false;
+        } else if (!sorNummer.equals(other.sorNummer))
+            return false;
+        return true;
+    }
 }

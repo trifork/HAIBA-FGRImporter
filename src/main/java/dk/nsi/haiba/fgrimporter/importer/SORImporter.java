@@ -29,7 +29,6 @@ package dk.nsi.haiba.fgrimporter.importer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -45,7 +44,6 @@ import com.google.common.base.Preconditions;
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.model.SORDataSets;
 import dk.nsi.haiba.fgrimporter.model.SOREventHandler;
-import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.parser.ParserException;
 import dk.sdsd.nsp.slalog.api.SLALogItem;
@@ -79,10 +77,9 @@ public class SORImporter implements Parser {
                 MDC.put("filename", file.getName());
 
                 SORDataSets dataSets = parse(file);
-                dao.saveSygehuse(dataSets.getSygehusDS().getEntities());
+                dao.saveSygehuse(dataSets.getSygehusDS());
                 processed += dataSets.getSygehusDS().size();
-                dao.saveSygehuseAfdelinger(dataSets.getSygehusAfdelingDS().getEntities());
-                Collection<SygehusAfdeling> entities = dataSets.getSygehusAfdelingDS().getEntities();
+                dao.saveSygehuseAfdelinger(dataSets.getSygehusAfdelingDS());
                 processed += dataSets.getSygehusAfdelingDS().size();
 
                 MDC.remove("filename");

@@ -27,7 +27,6 @@
 package dk.nsi.haiba.fgrimporter.dao.impl;
 
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -42,8 +41,6 @@ import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.importer.Organisation;
 import dk.nsi.haiba.fgrimporter.log.Log;
-import dk.nsi.haiba.fgrimporter.model.Sygehus;
-import dk.nsi.haiba.fgrimporter.model.SygehusAfdeling;
 
 @Transactional("haibaTransactionManager")
 public class SHAKDAOImpl extends CommonDAO implements SHAKDAO {

@@ -28,15 +28,9 @@ package dk.nsi.haiba.fgrimporter.integrationtest;
 
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.junit.Before;
@@ -58,7 +52,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.SORDAOImpl;
-import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.importer.SORImporter;
 
 /*
