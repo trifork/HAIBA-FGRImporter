@@ -45,7 +45,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
+import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
+import dk.nsi.haiba.fgrimporter.dao.impl.SORDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.importer.SORImporter;
@@ -56,8 +58,6 @@ import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepositoryJdbcImpl;
 import dk.nsi.haiba.fgrimporter.status.TimeSource;
 import dk.nsi.haiba.fgrimporter.status.TimeSourceRealTimeImpl;
-import dk.nsi.sdm4.core.persistence.AuditingPersister;
-import dk.nsi.sdm4.core.persistence.Persister;
 
 /**
  * Configuration class 
@@ -68,91 +68,96 @@ import dk.nsi.sdm4.core.persistence.Persister;
 @EnableTransactionManagement
 public class FGRConfiguration {
 
-	@Value("${jdbc.haibaJNDIName}")
-	private String haibaJdbcJNDIName;
-	
-	@Value("${dataDir}")
-	private String dataDir;
+    @Value("${jdbc.haibaJNDIName}")
+    private String haibaJdbcJNDIName;
+
+    @Value("${dataDir}")
+    private String dataDir;
 
 
-	// this is not automatically registered, see https://jira.springsource.org/browse/SPR-8539
-	@Bean
-	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-		PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
-		propertySourcesPlaceholderConfigurer.setIgnoreResourceNotFound(true);
-		propertySourcesPlaceholderConfigurer.setIgnoreUnresolvablePlaceholders(false);
+    // this is not automatically registered, see https://jira.springsource.org/browse/SPR-8539
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer = new PropertySourcesPlaceholderConfigurer();
+        propertySourcesPlaceholderConfigurer.setIgnoreResourceNotFound(true);
+        propertySourcesPlaceholderConfigurer.setIgnoreUnresolvablePlaceholders(false);
 
 		propertySourcesPlaceholderConfigurer.setLocations(new Resource[]{new ClassPathResource("default-config.properties"), new ClassPathResource("epimibaconfig.properties")});
 
-		return propertySourcesPlaceholderConfigurer;
-	}
+        return propertySourcesPlaceholderConfigurer;
+    }
 
-	@Bean
-	@Qualifier("haibaDataSource")
-	public DataSource haibaDataSource() throws Exception {
-		JndiObjectFactoryBean factory = new JndiObjectFactoryBean();
-		factory.setJndiName(haibaJdbcJNDIName);
-		factory.setExpectedType(DataSource.class);
-		factory.afterPropertiesSet();
-		return (DataSource) factory.getObject();
-	}
+    @Bean
+    @Qualifier("haibaDataSource")
+    public DataSource haibaDataSource() throws Exception {
+        JndiObjectFactoryBean factory = new JndiObjectFactoryBean();
+        factory.setJndiName(haibaJdbcJNDIName);
+        factory.setExpectedType(DataSource.class);
+        factory.afterPropertiesSet();
+        return (DataSource) factory.getObject();
+    }
 
-	@Bean
-	public JdbcTemplate haibaJdbcTemplate(@Qualifier("haibaDataSource") DataSource ds) {
-		return new JdbcTemplate(ds);
-	}
+    @Bean
+    public JdbcTemplate haibaJdbcTemplate(@Qualifier("haibaDataSource") DataSource ds) {
+        return new JdbcTemplate(ds);
+    }
 
-	@Bean
-	@Qualifier("haibaTransactionManager")
-	public PlatformTransactionManager haibaTransactionManager(@Qualifier("haibaDataSource") DataSource ds) {
-		return new DataSourceTransactionManager(ds);
-	}
+    @Bean
+    @Qualifier("haibaTransactionManager")
+    public PlatformTransactionManager haibaTransactionManager(@Qualifier("haibaDataSource") DataSource ds) {
+        return new DataSourceTransactionManager(ds);
+    }
 
 	// This needs the static modifier due to https://jira.springsource.org/browse/SPR-8269. If not static, field jdbcJndiName
-	// will not be set when trying to instantiate the DataSource
-	@Bean
-	public static CustomScopeConfigurer scopeConfigurer() {
-		return new SimpleThreadScopeConfigurer();
-	}
-	
-	@Bean
-	public ImportStatusRepository statusRepo() {
-		return new ImportStatusRepositoryJdbcImpl(); 
-	}
+    // will not be set when trying to instantiate the DataSource
+    @Bean
+    public static CustomScopeConfigurer scopeConfigurer() {
+        return new SimpleThreadScopeConfigurer();
+    }
 
-	@Bean
-	public ImportExecutor importExecutor() {
-		return new ImportExecutor();
-	}
+    @Bean
+    public ImportStatusRepository statusRepo() {
+        return new ImportStatusRepositoryJdbcImpl();
+    }
 
-	@Bean
-	public TimeSource timeSource() {
-		return new TimeSourceRealTimeImpl();
-	}
+    @Bean
+    public ImportExecutor importExecutor() {
+        return new ImportExecutor();
+    }
 
-	@Bean
-    public ReloadableResourceBundleMessageSource messageSource(){
-        ReloadableResourceBundleMessageSource messageSource=new ReloadableResourceBundleMessageSource();
-        String[] resources= {"classpath:messages"};
+    @Bean
+    public TimeSource timeSource() {
+        return new TimeSourceRealTimeImpl();
+    }
+
+    @Bean
+    public ReloadableResourceBundleMessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        String[] resources = { "classpath:messages" };
         messageSource.setBasenames(resources);
         return messageSource;
     }
-	
-	@Bean
-    public SHAKDAO haibaDao() {
+
+    @Bean
+    public SHAKDAO shakDao() {
         return new SHAKDAOImpl();
     }
-	
-	@Bean
-    public Parser shakParser() {
-		return new SKSParser();
-	}
 
-	@Bean
-	public Inbox inbox() throws Exception {
-		return new DirectoryInbox(dataDir,"fgrparser");
-	}
-	
+    @Bean
+    public SORDAO sorDao() {
+        return new SORDAOImpl();
+    }
+
+    @Bean
+    public Parser shakParser() {
+        return new SKSParser();
+    }
+
+    @Bean
+    public Inbox inbox() throws Exception {
+        return new DirectoryInbox(dataDir, "fgrparser");
+    }
+
     @Bean
     public Parser sorParser() {
         return new SORImporter();
