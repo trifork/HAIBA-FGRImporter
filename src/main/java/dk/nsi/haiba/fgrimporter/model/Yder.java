@@ -27,12 +27,9 @@
 
 package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.sdm4.core.domain.TemporalEntity;
-import dk.nsi.sdm4.core.util.Dates;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
-
-import java.util.Date;
 
 public class Yder {
     private String nummer;
@@ -165,7 +162,7 @@ public class Yder {
     }
 
     public Date getValidTo() {
-        return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
+        return (validTo != null) ? validTo : Util.THE_END_OF_TIME;
     }
 
     public void setValidTo(Date validTo) {

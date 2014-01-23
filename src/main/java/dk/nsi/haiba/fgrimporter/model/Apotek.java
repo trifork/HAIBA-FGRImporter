@@ -31,8 +31,6 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import dk.nsi.sdm4.core.util.Dates;
-
 public class Apotek 
 {
 	private Long sorNummer;
@@ -198,7 +196,7 @@ public class Apotek
 
 	public Date getValidTo()
 	{
-		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
+		return (validTo != null) ? validTo : Util.THE_END_OF_TIME;
 	}
 
 	public void setValidTo(Date validTo)

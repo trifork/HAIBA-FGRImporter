@@ -29,8 +29,6 @@ package dk.nsi.haiba.fgrimporter.model;
 
 import java.util.Date;
 
-import dk.nsi.sdm4.core.util.Dates;
-
 public class Sygehus 
 {
 	private String navn;
@@ -159,7 +157,7 @@ public class Sygehus
 
 	public Date getValidTo()
 	{
-		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
+		return (validTo != null) ? validTo : Util.THE_END_OF_TIME;
 	}
 
 	public void setValidTo(Date validTo)

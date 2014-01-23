@@ -27,17 +27,10 @@
 
 package dk.nsi.haiba.fgrimporter.model;
 
-import dk.nsi.sdm4.core.util.Dates;
+import java.util.Date;
 
 import org.apache.log4j.Logger;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-
-import java.util.Date;
-
-@Entity
 public class Praksis
 {
 	private String navn;
@@ -104,7 +97,7 @@ public class Praksis
 
 	public Date getValidTo()
 	{
-		return (validTo != null) ? validTo : Dates.THE_END_OF_TIME;
+		return (validTo != null) ? validTo : Util.THE_END_OF_TIME;
 	}
 
 	public void setValidTo(Date validTo)
