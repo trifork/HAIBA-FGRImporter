@@ -58,6 +58,8 @@ import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepositoryJdbcImpl;
 import dk.nsi.haiba.fgrimporter.status.TimeSource;
 import dk.nsi.haiba.fgrimporter.status.TimeSourceRealTimeImpl;
+import dk.sdsd.nsp.slalog.api.SLALogConfig;
+import dk.sdsd.nsp.slalog.api.SLALogger;
 
 /**
  * Configuration class 
@@ -161,5 +163,10 @@ public class FGRConfiguration {
     @Bean
     public Parser sorParser() {
         return new SORImporter();
+    }
+    
+    @Bean
+    public SLALogger slaLogger() {
+        return new SLALogConfig("Stamdata SOR-importer", "sorimporter").getSLALogger();
     }
 }
