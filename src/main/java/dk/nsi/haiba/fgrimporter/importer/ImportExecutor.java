@@ -50,7 +50,7 @@ public class ImportExecutor {
 	private boolean manualOverride;
 	
 	@Autowired
-	SHAKDAO haibaDao;
+	SHAKDAO dao;
 
 	@Autowired
 	ImportStatusRepository statusRepo;
