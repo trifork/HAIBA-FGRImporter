@@ -160,9 +160,9 @@ public class StatusReporter {
 
         String url = request.getRequestURL().toString();
 
-        sb.append("<a href=\"" + url + "?manual=true\">Manual start importer</a>");
+        sb.append("<a href=\"" + url + "?manual_"+type+"=true\">Manual start importer</a>");
         sb.append("</br>");
-        sb.append("<a href=\"" + url + "?manual=false\">Scheduled start importer</a>");
+        sb.append("<a href=\"" + url + "?manual_"+type+"=false\">Scheduled start importer</a>");
         sb.append("</br>");
         if (manual.equalsIgnoreCase("true")) {
             sb.append("status: MANUAL");
