@@ -57,7 +57,9 @@ import dk.nsi.haiba.fgrimporter.status.TimeSource;
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class ImportStatusRepositoryJdbcImplIT {
 
-	@Configuration
+	private static final String TYPE = "na";
+
+    @Configuration
 	@PropertySource("classpath:test.properties")
 	@Import(FGRIntegrationTestConfiguration.class)
 	static class ContextConfiguration {
@@ -79,7 +81,7 @@ public class ImportStatusRepositoryJdbcImplIT {
 
 	@Test
 	public void returnsNoStatusWhenTableIsEmpty() {
-		assertNull(statusRepo.getLatestStatus());
+		assertNull(statusRepo.getLatestStatus(TYPE));
 	}
 
 	@Before
@@ -90,9 +92,9 @@ public class ImportStatusRepositoryJdbcImplIT {
 	@Test
 	public void returnsOpenStatusWhenOnlyOneOpenStatusInDb() {
 		DateTime startTime = new DateTime().withMillisOfSecond(0);
-		statusRepo.importStartedAt(startTime);
+		statusRepo.importStartedAt(startTime, TYPE);
 
-		ImportStatus latestStatus = statusRepo.getLatestStatus();
+		ImportStatus latestStatus = statusRepo.getLatestStatus(TYPE);
 		assertNotNull(latestStatus);
 		assertEquals(startTime, latestStatus.getStartTime());
 	}
@@ -101,37 +103,37 @@ public class ImportStatusRepositoryJdbcImplIT {
 	public void callingEndedAtWithAnEmptyDatabaseDoesNothing() {
 		// this can happen in the ParserExecutor, if some exception occurs
 		// before we reach the call to importStartedAt
-		statusRepo.importEndedWithFailure(new DateTime(), "ErrorMessage");
-		assertNull(statusRepo.getLatestStatus());
+		statusRepo.importEndedWithFailure(new DateTime(), "ErrorMessage", TYPE);
+		assertNull(statusRepo.getLatestStatus(TYPE));
 	}
 
 	@Test
 	public void returnsClosedStatusWhenOnlyOneStatusInDb() {
 		ImportStatus expectedStatus = insertStatusInDb(ImportStatus.Outcome.SUCCESS);
 
-		assertEquals(expectedStatus, statusRepo.getLatestStatus());
+		assertEquals(expectedStatus, statusRepo.getLatestStatus(TYPE));
 	}
 
 	@Test
 	public void returnsSuccesStatusFromDb() {
 		insertStatusInDb(ImportStatus.Outcome.SUCCESS);
-		assertEquals(ImportStatus.Outcome.SUCCESS, statusRepo.getLatestStatus().getOutcome());
+		assertEquals(ImportStatus.Outcome.SUCCESS, statusRepo.getLatestStatus(TYPE).getOutcome());
 		
-		assertTrue(statusRepo.getLatestStatus().toString().contains("Outcome was SUCCESS"));
+		assertTrue(statusRepo.getLatestStatus(TYPE).toString().contains("Outcome was SUCCESS"));
 	}
 
 	@Test
 	public void returnsErrorStatusFromDb() {
 		insertStatusInDb(ImportStatus.Outcome.FAILURE);
-		assertEquals(ImportStatus.Outcome.FAILURE, statusRepo.getLatestStatus().getOutcome());
-		assertTrue(statusRepo.getLatestStatus().toString().contains("Outcome was FAILURE"));
+		assertEquals(ImportStatus.Outcome.FAILURE, statusRepo.getLatestStatus(TYPE).getOutcome());
+		assertTrue(statusRepo.getLatestStatus(TYPE).toString().contains("Outcome was FAILURE"));
 	}
 
 	@Test
 	public void openStatusHasNoOutcome() {
 		DateTime startTime = new DateTime();
-		statusRepo.importStartedAt(startTime);
-		assertNull(statusRepo.getLatestStatus().getOutcome());
+		statusRepo.importStartedAt(startTime, TYPE);
+		assertNull(statusRepo.getLatestStatus(TYPE).getOutcome());
 	}
 	
 	@Test
@@ -142,26 +144,26 @@ public class ImportStatusRepositoryJdbcImplIT {
 							// startTime as the one just inserted
 		ImportStatus expectedStatus = insertStatusInDb(ImportStatus.Outcome.FAILURE);
 
-		ImportStatus latestStatus = statusRepo.getLatestStatus();
+		ImportStatus latestStatus = statusRepo.getLatestStatus(TYPE);
 		assertEquals(expectedStatus, latestStatus);
 	}
 
 	@Test
 	public void whenTwoOpenStatusesExistsInDbEndingOnlyUpdatesTheLatest() throws InterruptedException {
 		DateTime startTimeOldest = new DateTime().withMillisOfSecond(0);
-		statusRepo.importStartedAt(startTimeOldest);
+		statusRepo.importStartedAt(startTimeOldest, TYPE);
 		// The reason for this not being closed would be some kind of program
 		// error or outage
 		Thread.sleep(1000);
 
 		DateTime startTimeNewest = new DateTime().withMillisOfSecond(0);
-		statusRepo.importStartedAt(startTimeNewest);
+		statusRepo.importStartedAt(startTimeNewest, TYPE);
 
 		Thread.sleep(1000);
-		statusRepo.importEndedWithFailure(new DateTime().withMillisOfSecond(0), "ErrorMessage");
+		statusRepo.importEndedWithFailure(new DateTime().withMillisOfSecond(0), "ErrorMessage", TYPE);
 
 		// check that the newest was closed
-		ImportStatus dbStatus = statusRepo.getLatestStatus();
+		ImportStatus dbStatus = statusRepo.getLatestStatus(TYPE);
 		assertEquals(startTimeNewest, dbStatus.getStartTime());
 		assertNotNull(dbStatus.getEndTime());
 
@@ -172,53 +174,56 @@ public class ImportStatusRepositoryJdbcImplIT {
 
 	@Test
 	public void jobIsNotOverdueWhenItHasNotRun() {
-		assertFalse(statusRepo.isOverdue());
+		assertFalse(statusRepo.isOverdue(TYPE));
 	}
 
 	@Test
 	public void jobIsNotOverdueWhenItHasJustRunWithSucces() {
 		insertStatusInDb(ImportStatus.Outcome.SUCCESS);
-		assertFalse(statusRepo.isOverdue());
+		assertFalse(statusRepo.isOverdue(TYPE));
 	}
 
 	@Test
 	public void jobIsNotOverdueWhenItHasJustRunWithError() {
 		insertStatusInDb(ImportStatus.Outcome.FAILURE);
-		assertFalse(statusRepo.isOverdue());
+		assertFalse(statusRepo.isOverdue(TYPE));
 	}
 
 	@Test
 	public void jobIsOverdueWhenItRanMoreDaysAgoThanTheLimit() {
 		insertStatusInDb(ImportStatus.Outcome.FAILURE);
 		timeSource.now = (new DateTime()).plusDays(2);
-		assertTrue(statusRepo.isOverdue());
+		assertTrue(statusRepo.isOverdue(TYPE));
 	}
 
 	@Test
 	public void jobIsNotOverdueOneSecondBeforeTheDeadline() {
 		insertStatusInDb(ImportStatus.Outcome.FAILURE);
 		timeSource.now = (new DateTime()).plusDays(1).minusSeconds(1);
-		assertFalse(statusRepo.isOverdue());
+		assertFalse(statusRepo.isOverdue(TYPE));
 	}
 
 	@Test
 	public void jobIsOverdueOneSecondAfterTheDeadline() {
+	    System.out.println("ImportStatusRepositoryJdbcImplIT.jobIsOverdueOneSecondAfterTheDeadline() start");
 		insertStatusInDb(ImportStatus.Outcome.FAILURE);
 		timeSource.now = (new DateTime()).plusDays(1).plusSeconds(1);
-		assertTrue(statusRepo.isOverdue());
+		assertTrue(statusRepo.isOverdue(TYPE));
+		System.out.println("ImportStatusRepositoryJdbcImplIT.jobIsOverdueOneSecondAfterTheDeadline() end");
 	}
 
 	private ImportStatus insertStatusInDb(ImportStatus.Outcome outcome) {
 		DateTime startTime = new DateTime().withMillisOfSecond(0);
-		statusRepo.importStartedAt(startTime);
+		statusRepo.importStartedAt(startTime, TYPE);
 		DateTime endTime = new DateTime().withMillisOfSecond(0);
 
 		ImportStatus expectedStatus = new ImportStatus();
 
 		if (outcome == ImportStatus.Outcome.SUCCESS) {
-			statusRepo.importEndedWithSuccess(endTime);
+			statusRepo.importEndedWithSuccess(endTime, TYPE);
 		} else {
-			statusRepo.importEndedWithFailure(endTime, "ErrorMessage");
+		    System.out.println("ImportStatusRepositoryJdbcImplIT.insertStatusInDb() ERROR");
+			statusRepo.importEndedWithFailure(endTime, "ErrorMessage", TYPE);
 			expectedStatus.setErrorMessage("ErrorMessage");
 		}
 

@@ -57,62 +57,63 @@ public class ImportStatusRepositoryJdbcImpl extends CommonDAO implements ImportS
 	@Override
 //	@Transactional(value="haibaTransactionManager", propagation = Propagation.REQUIRES_NEW)
 	@Transactional(value="haibaTransactionManager")
-	public void importStartedAt(DateTime startTime) {
+	public void importStartedAt(DateTime startTime, String type) {
 		log.debug("Starting import");
-		haibaJdbcTemplate.update("INSERT INTO FGRImporterStatus (StartTime) values (?)", startTime.toDate());
+		haibaJdbcTemplate.update("INSERT INTO FGRImporterStatus (StartTime, Type) values (?, ?)", startTime.toDate(), type);
 	}
 
 	@Override
 //	@Transactional(value="haibaTransactionManager", propagation = Propagation.MANDATORY)
 	@Transactional(value="haibaTransactionManager")
-	public void importEndedWithSuccess(DateTime endTime) {
+	public void importEndedWithSuccess(DateTime endTime, String type) {
 		log.debug("Import ended with success");
-		importEndedAt(endTime, ImportStatus.Outcome.SUCCESS, null);
+		importEndedAt(endTime, ImportStatus.Outcome.SUCCESS, null, type);
 	}
 
 	@Override
 //	@Transactional(value="haibaTransactionManager", propagation = Propagation.REQUIRES_NEW)
 	@Transactional(value="haibaTransactionManager")
-	public void importEndedWithFailure(DateTime endTime, String errorMessage) {
+	public void importEndedWithFailure(DateTime endTime, String errorMessage, String type) {
 		log.debug("Import ended with failure");
 		if(errorMessage != null && errorMessage.length() > 200) {
 			errorMessage = errorMessage.substring(0, 200); // truncate to match db layout
 		}
-		importEndedAt(endTime, ImportStatus.Outcome.FAILURE, errorMessage);
+		importEndedAt(endTime, ImportStatus.Outcome.FAILURE, errorMessage, type);
 	}
 
-	private void importEndedAt(DateTime endTime, ImportStatus.Outcome outcome, String errorMessage) {
+	private void importEndedAt(DateTime endTime, ImportStatus.Outcome outcome, String errorMessage, String type) {
 		String sql = null;
 		if(MYSQL.equals(getDialect())) {
-			sql = "SELECT Id from FGRImporterStatus ORDER BY StartTime DESC LIMIT 1";
+			sql = "SELECT Id from FGRImporterStatus WHERE Type = ? ORDER BY StartTime DESC LIMIT 1";
 		} else {
 			// MSSQL
-			sql = "SELECT Top 1 Id from FGRImporterStatus ORDER BY StartTime DESC";
+			sql = "SELECT Top 1 Id from FGRImporterStatus WHERE Type = ? ORDER BY StartTime DESC";
 		}
-
+System.out.println("querying");
 		Long newestOpenId;
 		try {
-			newestOpenId = haibaJdbcTemplate.queryForLong(sql);
+			newestOpenId = haibaJdbcTemplate.queryForLong(sql, type);
 		} catch (EmptyResultDataAccessException e) {
 			log.debug("it seems we do not have any open statuses, let's not update");
 			return;
 		}
+		System.out.println("importEndedAt: newestOpenId="+newestOpenId);
 
-		haibaJdbcTemplate.update("UPDATE FGRImporterStatus SET EndTime=?, Outcome=?, ErrorMessage=? WHERE Id=?", endTime.toDate(), outcome.toString(), errorMessage, newestOpenId);
+		haibaJdbcTemplate.update("UPDATE FGRImporterStatus SET Type=?, EndTime=?, Outcome=?, ErrorMessage=? WHERE Id=?", type, endTime.toDate(), outcome.toString(), errorMessage, newestOpenId);
 	}
 
 	@Override
-	public ImportStatus getLatestStatus() {
+	public ImportStatus getLatestStatus(String type) {
 		String sql = null;
 		if(MYSQL.equals(getDialect())) {
-			sql = "SELECT * from FGRImporterStatus ORDER BY StartTime DESC LIMIT 1";
+			sql = "SELECT * from FGRImporterStatus WHERE Type = ? ORDER BY StartTime DESC LIMIT 1";
 		} else {
 			// MSSQL
-			sql = "SELECT Top 1 * from FGRImporterStatus ORDER BY StartTime DESC";
+			sql = "SELECT Top 1 * from FGRImporterStatus WHERE Type = ? ORDER BY StartTime DESC";
 		}
 
 		try {
-			return haibaJdbcTemplate.queryForObject(sql, new ImportStatusRowMapper());
+			return haibaJdbcTemplate.queryForObject(sql, new Object[]{type}, new ImportStatusRowMapper());
 		} catch (EmptyResultDataAccessException ignored) {
 			// that's not a problem, we just don't have any statuses
 			return null;
@@ -129,8 +130,8 @@ public class ImportStatusRepositoryJdbcImpl extends CommonDAO implements ImportS
 	 *     ^                 ^
 	 *   !overdue         overdue
 	 */
-	public boolean isOverdue() {
-		ImportStatus latestStatus = getLatestStatus();
+	public boolean isOverdue(String type) {
+		ImportStatus latestStatus = getLatestStatus(type);
 		if (latestStatus == null) {
 			// we're not overdue if we have never run
 			return false;

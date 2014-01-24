@@ -16,6 +16,7 @@ CREATE TABLE Organisation (
 
 CREATE TABLE IF NOT EXISTS FGRImporterStatus (
     Id BIGINT IDENTITY NOT NULL PRIMARY KEY,
+    Type VARCHAR(20),
     StartTime DATETIME NOT NULL,
     EndTime DATETIME,
     Outcome VARCHAR(20),
