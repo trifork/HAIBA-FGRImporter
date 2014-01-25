@@ -35,14 +35,15 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 
-import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
 import dk.nsi.haiba.fgrimporter.parser.Inbox;
+import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 
 /*
@@ -53,14 +54,22 @@ public class ImportExecutor {
 
     public static final String SHAK = "shak";
     public static final String SKS = "sks";
-    
+    public static final String SOR = "sor";
+
     private Map<String, Boolean> manualOverrideMap = new HashMap<String, Boolean>();
+
+    @Value("${sor.folderpath}")
+    private String sorFolderPath;
 
     @Autowired
     ImportStatusRepository statusRepo;
 
     @Autowired
+    // XXX wont work - needs an inbox for each parser
     Inbox inbox;
+
+    @Autowired
+    Parser sorParser;
 
     @Autowired
     SKSParser<Organisation> shakParser;
@@ -74,9 +83,20 @@ public class ImportExecutor {
     @Autowired
     SKSDAO<SKSLine> sksDao;
 
+    @Scheduled(cron = "${cron.sor.import.job}")
+    public void runSor() {
+        if (!isManualOverride(SOR)) {
+            log.debug("Running sor Importer: " + new Date().toString());
+            File sorFolder = new File(sorFolderPath);
+            sorParser.process(sorFolder, SOR);
+        } else {
+            log.debug("Sor importer must be started manually");
+        }
+    }
+
     @Scheduled(cron = "${cron.shak.import.job}")
     public void runShak() {
-        if (!isManualOverride("shak")) {
+        if (!isManualOverride(SHAK)) {
             log.debug("Running shak Importer: " + new Date().toString());
             doProcess(shakDao, shakParser, SHAK);
         } else {
@@ -111,7 +131,6 @@ public class ImportExecutor {
                 File dataSet = inbox.top();
 
                 if (dataSet != null) {
-
                     parser.process(dataSet, "TODO");
                     Set<T> entities = parser.getEntities();
                     if (entities != null && !entities.isEmpty()) {
