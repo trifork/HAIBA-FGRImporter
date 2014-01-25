@@ -115,12 +115,12 @@ public class StatusReporter {
         String manual = request.getParameter("manual_" + type);
         if (manual == null || manual.trim().length() == 0) {
             // no value set, use default set in the import executor
-            // XXX
             manual = "" + importExecutor.isManualOverride(type);
         } else {
             // manual flag is set on the request
             if (manual.equalsIgnoreCase("true")) {
                 // flag is true, start the importer in a new thread
+                // XXX not a new thread
                 importExecutor.setManualOverride(type, true);
                 Runnable importer = new Runnable() {
                     public void run() {
@@ -129,7 +129,6 @@ public class StatusReporter {
                 };
                 importer.run();
             } else {
-                // XXX
                 importExecutor.setManualOverride(type, false);
             }
         }
@@ -181,5 +180,4 @@ public class StatusReporter {
             body.append("\n" + latestStatus.toString());
         }
     }
-
 }
