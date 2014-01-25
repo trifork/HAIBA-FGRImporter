@@ -44,7 +44,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
@@ -179,7 +178,7 @@ public class FGRConfiguration {
     }
 
     @Bean
-    public Parser sorParser() {
+    public SORImporter sorParser() {
         return new SORImporter();
     }
 
