@@ -36,7 +36,5 @@ public interface SORDAO {
 
     public void saveSygehuseAfdelinger(Collection<SygehusAfdeling> entities);
 
-    public void clearSygehuse();
-
-    public void clearSygehusAfdelinger();
+    public void clear();
 }

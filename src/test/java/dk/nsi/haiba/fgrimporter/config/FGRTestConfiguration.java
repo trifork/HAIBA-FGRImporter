@@ -48,6 +48,11 @@ public class FGRTestConfiguration extends FGRConfiguration {
     }
 
     @Bean
+    public DataSource classDataSource() {
+        return mock(DataSource.class);
+    }
+
+    @Bean
     public SLALogger slaLogger() {
         return mock(SLALogger.class);
     }

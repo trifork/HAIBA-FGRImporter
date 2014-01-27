@@ -44,111 +44,64 @@ public class SORDAOImpl implements SORDAO {
     private static Log log = new Log(Logger.getLogger(SORDAOImpl.class));
 
     @Autowired
-    @Qualifier("haibaJdbcTemplate")
+    @Qualifier("classJdbcTemplate")
     JdbcTemplate jdbc;
 
     @Override
-    public void clearSygehuse() {
-        jdbc.update("TRUNCATE TABLE SORSygehus");
-    }
-
-    @Override
-    public void clearSygehusAfdelinger() {
-        jdbc.update("TRUNCATE TABLE SORSygehusAfdeling");
+    public void clear() {
+        jdbc.update("TRUNCATE TABLE Klass_SOR");
     }
 
     @Override
     public void saveSygehuseAfdelinger(Collection<SygehusAfdeling> entities) {
         for (SygehusAfdeling sa : entities) {
-            try {
-                // @formatter:off
+            Long Sor_ID = sa.getSorNummer();
+            String SHAK = sa.getNummer();
+            if (Sor_ID != null && SHAK != null) {
+                try {
+                    // @formatter:off
             String sql = ""
-                    + "INSERT INTO SORSygehusAfdeling "
-                    + "            (SorNummer, "
-                    + "             EanLokationsnummer, "
-                    + "             Nummer, "
-                    + "             Navn, "
-                    + "             SygehusSorNummer, "
-                    + "             OverAfdelingSorNummer, "
-                    + "             UnderlagtSygehusSorNummer, "
-                    + "             AfdelingTypeKode, "
-                    + "             AfdelingTypeTekst, "
-                    + "             HovedSpecialeKode, "
-                    + "             HovedSpecialeTekst, "
-                    + "             Telefon, "
-                    + "             Vejnavn, "
-                    + "             Postnummer, "
-                    + "             Bynavn, "
-                    + "             Email, "
-                    + "             Www, "
-                    + "             ValidFrom, "
-                    + "             ValidTo) "
-                    + "VALUES      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-             jdbc.update(sql,
-                     sa.getSorNummer(), 
-                     sa.getEanLokationsnummer(),
-                     sa.getNummer(),
-                     sa.getNavn(),
-                     sa.getSygehusSorNummer(),
-                     sa.getOverAfdelingSorNummer(),
-                     sa.getUnderlagtSygehusSorNummer(),
-                     sa.getAfdelingTypeKode(),
-                     sa.getAfdelingTypeTekst(),
-                     sa.getHovedSpecialeKode(),
-                     sa.getHovedSpecialeTekst(),
-                     sa.getTelefon(),
-                     sa.getVejnavn(),
-                     sa.getPostnummer(),
-                     sa.getBynavn(),
-                     sa.getEmail(),
-                     sa.getWww(),
-                     sa.getValidFrom(),
-                     sa.getValidTo()
+                    + "INSERT INTO Klass_SOR "
+                    + "            (Sor_ID, "
+                    + "             SHAK) "
+                    + "VALUES      (?, ?)";
+            jdbc.update(sql,
+                     Sor_ID, 
+                     SHAK
                      );
              // @formatter:on}
-            } catch (DataAccessException e) {
-                throw new DAOException(e.getMessage(), e);
+                } catch (DataAccessException e) {
+                    throw new DAOException(e.getMessage(), e);
+                }
+            } else {
+                log.info("no SHAK or SOR_Id in " + sa);
             }
         }
     }
 
     @Override
     public void saveSygehuse(Collection<Sygehus> entities) {
-        for (Sygehus sygehus : entities) {
-            try {
-                // @formatter:off
-                String sql = ""
-                        + "INSERT INTO SORSygehus "
-                        + "            (SorNummer, "
-                        + "             EanLokationsnummer, "
-                        + "             Nummer, "
-                        + "             Telefon, "
-                        + "             Navn, "
-                        + "             Vejnavn, "
-                        + "             Postnummer, "
-                        + "             Bynavn, "
-                        + "             Email, "
-                        + "             Www, "
-                        + "             ValidFrom, "
-                        + "             ValidTo) "
-                        + "VALUES      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-             jdbc.update(sql,
-                     sygehus.getSorNummer(), 
-                     sygehus.getEanLokationsnummer(),
-                     sygehus.getNummer(),
-                     sygehus.getTelefon(),
-                     sygehus.getNavn(),
-                     sygehus.getVejnavn(),
-                     sygehus.getPostnummer(),
-                     sygehus.getBynavn(),
-                     sygehus.getEmail(),
-                     sygehus.getWww(),
-                     sygehus.getValidFrom(),
-                     sygehus.getValidTo()
+        for (Sygehus s : entities) {
+            Long Sor_ID = s.getSorNummer();
+            String SHAK = s.getNummer();
+            if (Sor_ID != null && SHAK != null) {
+                try {
+                    // @formatter:off
+            String sql = ""
+                    + "INSERT INTO Klass_SOR "
+                    + "            (Sor_ID, "
+                    + "             SHAK) "
+                    + "VALUES      (?, ?)";
+            jdbc.update(sql,
+                     Sor_ID, 
+                     SHAK
                      );
              // @formatter:on}
-            } catch (DataAccessException e) {
-                throw new DAOException(e.getMessage(), e);
+                } catch (DataAccessException e) {
+                    throw new DAOException(e.getMessage(), e);
+                }
+            } else {
+                log.info("no SHAK or SOR_Id in " + s);
             }
         }
     }

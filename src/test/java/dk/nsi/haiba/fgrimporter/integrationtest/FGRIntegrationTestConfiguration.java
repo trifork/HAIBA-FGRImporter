@@ -65,11 +65,17 @@ public class FGRIntegrationTestConfiguration extends FGRConfiguration {
 	}
 
 	@Bean
-	@Qualifier("haibaDataSource")
 	public DataSource haibaDataSource() throws Exception{
 		String jdbcUrlPrefix = "jdbc:mysql://127.0.0.1:" + mysqlPort + "/";
 
 		return new SimpleDriverDataSource(new Driver(), jdbcUrlPrefix + testHAIBADbName + "?createDatabaseIfNotExist=true", testHAIBADbUsername, testHAIBADbPassword);
+	}
+
+	@Bean
+	public DataSource classDataSource() throws Exception{
+	    String jdbcUrlPrefix = "jdbc:mysql://127.0.0.1:" + mysqlPort + "/";
+	    
+	    return new SimpleDriverDataSource(new Driver(), jdbcUrlPrefix + testHAIBADbName + "?createDatabaseIfNotExist=true", testHAIBADbUsername, testHAIBADbPassword);
 	}
 
 	@Bean
@@ -78,9 +84,18 @@ public class FGRIntegrationTestConfiguration extends FGRConfiguration {
 	}
 
 	@Bean
-	@Qualifier("haibaTransactionManager")
+	public JdbcTemplate classJdbcTemplate(@Qualifier("classDataSource") DataSource ds) {
+	    return new JdbcTemplate(ds);
+	}
+
+	@Bean
 	public PlatformTransactionManager haibaTransactionManager(@Qualifier("haibaDataSource") DataSource ds) {
 		return new DataSourceTransactionManager(ds);
+	}
+
+	@Bean
+	public PlatformTransactionManager classTransactionManager(@Qualifier("classDataSource") DataSource ds) {
+	    return new DataSourceTransactionManager(ds);
 	}
 
 	@Bean

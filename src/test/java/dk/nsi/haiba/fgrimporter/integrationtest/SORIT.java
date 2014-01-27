@@ -59,10 +59,9 @@ import dk.nsi.haiba.fgrimporter.importer.SORImporter;
  * Spring transaction ensures rollback after test is finished
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@Transactional("haibaTransactionManager")
+@Transactional("classTransactionManager")
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
 public class SORIT {
-	
     @Configuration
     @PropertySource("classpath:test.properties")
     @Import(FGRIntegrationTestConfiguration.class)
@@ -71,11 +70,10 @@ public class SORIT {
         public SORDAO sorDao() {
             return new SORDAOImpl();
         }
-
     }
 
     @Autowired
-    @Qualifier("haibaJdbcTemplate")
+    @Qualifier("classJdbcTemplate")
     JdbcTemplate jdbc;
     
     @Autowired
@@ -95,8 +93,7 @@ public class SORIT {
 	public void canImportTheCorrectNumberOfRecords() throws Throwable {
 		importer.process(datasetDirWith("data/sor/Sor.xml"), "");
 		
-		assertEquals(489, jdbc.queryForInt("SELECT COUNT(*) FROM SORSygehus"));
-		assertEquals(3336, jdbc.queryForInt("SELECT COUNT(*) FROM SORSygehusAfdeling"));
+		assertEquals(3802, jdbc.queryForInt("SELECT COUNT(*) FROM Klass_SOR"));
 	}
 
     private File datasetDirWith(String filename) throws IOException {
@@ -108,5 +105,4 @@ public class SORIT {
 	private File getFile(String filename) {
 		return toFile(getClass().getClassLoader().getResource(filename));
 	}
-
 }
