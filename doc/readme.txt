@@ -1,2 +1,2 @@
 from link http://www.ssi.dk/Sundhedsdataogit/National%20Sundheds-it/TerminologiOgKlassifikationer/~/media/Indhold/DK%20-%20dansk/Sundhedsdata%20og%20it/NationalSundhedsIt/Klassifikationer/SygehusAfdelingsKlassifikationen/SHAK-tabelstruktur.ashx
-from url http://www.ssi.dk/Sundhedsdataogit/National%20Sundheds-it/TerminologiOgKlassifikationer/SHAK.aspx
+from the page http://www.ssi.dk/Sundhedsdataogit/National%20Sundheds-it/TerminologiOgKlassifikationer/SHAK.aspx
