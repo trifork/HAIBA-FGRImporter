@@ -36,7 +36,11 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
@@ -57,12 +61,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 
-import dk.nsi.haiba.fgrimporter.dao.SHAKDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
+import dk.nsi.haiba.fgrimporter.model.SKSLine;
 
 /*
  * Tests the HAIBADAO class
@@ -78,10 +82,14 @@ public class SKSIT {
     @Import(FGRIntegrationTestConfiguration.class)
     static class ContextConfiguration {
         @Bean
-        public SKSDAO<Organisation> dao() {
+        public SKSDAO<Organisation> shakdao() {
             return new SHAKDAOImpl();
         }
 
+        @Bean
+        public SKSDAO<SKSLine> sksdao() {
+            return new GenericSKSLineDAOImpl();
+        }
     }
 
     @Autowired
@@ -89,7 +97,10 @@ public class SKSIT {
     JdbcTemplate jdbc;
 
     @Autowired
-    SKSDAO<Organisation> dao;
+    SKSDAO<Organisation> shakDao;
+
+    @Autowired
+    SKSDAO<SKSLine> sksDao;
 
     @Rule
     public TemporaryFolder tmpDir = new TemporaryFolder();
@@ -97,19 +108,27 @@ public class SKSIT {
     @Autowired
     SKSParser<Organisation> shakParser;
 
+    @Autowired
+    SKSParser<SKSLine> sksParser;
+
     @Before
-    public void init() {
+    public void init() throws IOException {
     }
 
     @Test
     public void canImportTheCorrectNumberOfRecords() throws Throwable {
-        process("data/sks/SHAKCOMPLETE.TXT");
-
+        process(shakParser, shakDao, "data/sks/SHAKCOMPLETE.TXT");
         // FIXME: These record counts are only correct iff if duplicate keys are disregarted.
         // This is unfortunate. Keys are currently only considered based their SKSKode.
         // They should be a combination of type + kode + startdato based on the register doc.
         assertEquals(745, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Sygehus'"));
         assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Afdeling'"));
+
+        process(sksParser, sksDao, "data/sks/SKScomplete.txt");
+        assertEquals(573, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'und'"));
+        assertEquals(8930, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'pro'"));
+        assertEquals(42222, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'dia'"));
+        assertEquals(19955, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'opr'"));
     }
 
     @Test
@@ -118,7 +137,8 @@ public class SKSIT {
         // Rigshospitalet have the following date specified in input:
         // Valid from inclusive = 19760401
         // Valid to inclusive = 25000101
-        process("data/sks/SHAKCOMPLETE.TXT");
+        process(shakParser, shakDao, "data/sks/SHAKCOMPLETE.TXT");
+        process(sksParser, sksDao, "data/sks/SKScomplete.txt");
 
         Date validTo = jdbc.queryForObject("SELECT ValidTo FROM Organisation WHERE Navn='Rigshospitalet'", Date.class);
         Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM Organisation WHERE Navn='Rigshospitalet'",
@@ -133,11 +153,18 @@ public class SKSIT {
         Date lastInvalidBefore = formatter.parse("1976-03-31 23:59:58");
         assertTrue(validFrom.after(lastInvalidBefore));
         assertTrue(validFrom.before(firstValidFrom));
+
+        validTo = jdbc.queryForObject("SELECT ValidTo FROM GenericSKS WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'", Date.class);
+        validFrom = jdbc.queryForObject("SELECT ValidFrom FROM GenericSKS WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'",
+                Date.class);
+        // from 201201012 to 25000101
+        assertEquals(new Date(validFrom.getTime()), new Date(formatter.parse("2012-01-01 00:00:00").getTime()));
+        assertEquals(new Date(validTo.getTime()), new Date(formatter.parse("2500-01-02 00:00:00").getTime()));
     }
 
     @Test
     public void updatesValidToAndModifiedDate() throws IOException, InterruptedException {
-        process("data/sks/SHAKCOMPLETE.TXT");
+        process(shakParser, shakDao, "data/sks/SHAKCOMPLETE.TXT");
         Timestamp timestamp = new Timestamp((new Date()).getTime());
         Timestamp modified1 = jdbc.queryForObject("SELECT ModifiedDate FROM Organisation LIMIT 1", Timestamp.class);
 
@@ -146,7 +173,7 @@ public class SKSIT {
 
         // Check no invalid records exist
         Thread.sleep(1000);
-        process("data/sks2/SHAKCOMPLETE.TXT");
+        process(shakParser, shakDao, "data/sks2/SHAKCOMPLETE.TXT");
         timestamp = new Timestamp((new Date()).getTime());
 
         // Check some records have been invalidated
@@ -159,15 +186,30 @@ public class SKSIT {
         assertFalse(modified1.equals(modified2));
     }
 
-    private void process(String string) throws IOException {
-        shakParser.process(datasetDirWith(string), "");
-        Set<Organisation> entities = shakParser.getEntities();
+    private <T extends SKSLine> void process(SKSParser<T> parser, SKSDAO<T> dao, String string) throws IOException {
+        parser.process(datasetDirWith(string), "");
+        Set<T> entities = parser.getEntities();
         if (entities != null && !entities.isEmpty()) {
             dao.clearTable();
-            for (Organisation t : entities) {
+            for (T t : entities) {
                 dao.saveEntity(t);
             }
         }
+//        
+//        Map<String, List<T>> map = new HashMap<String, List<T>>(); 
+//        for (T t : entities) {
+//            List<T> list = map.get(t.getType());
+//            if (list == null) {
+//                list = new ArrayList<T>();
+//                map.put(t.getType(), list);
+//            }
+//            list.add(t);
+//        }
+//        
+//        Set<String> keySet = map.keySet();
+//        for (String key : keySet) {
+//            System.out.println("got "+map.get(key).size()+" of '"+key+"'");
+//        }
     }
 
     private File datasetDirWith(String filename) throws IOException {
@@ -179,5 +221,4 @@ public class SKSIT {
     private File getFile(String filename) {
         return toFile(getClass().getClassLoader().getResource(filename));
     }
-
 }
