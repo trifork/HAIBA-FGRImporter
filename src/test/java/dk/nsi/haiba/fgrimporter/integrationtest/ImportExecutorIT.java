@@ -26,17 +26,10 @@
  */
 package dk.nsi.haiba.fgrimporter.integrationtest;
 
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.junit.Assert.assertEquals;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,9 +43,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
 
+import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
+import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
+import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SORDAOImpl;
-import dk.nsi.haiba.fgrimporter.importer.SORImporter;
+import dk.nsi.haiba.fgrimporter.importer.FileFetch;
+import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
+import dk.nsi.haiba.fgrimporter.model.Organisation;
+import dk.nsi.haiba.fgrimporter.model.SKSLine;
 
 /*
  * Tests the HAIBADAO class
@@ -61,7 +60,7 @@ import dk.nsi.haiba.fgrimporter.importer.SORImporter;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional("classTransactionManager")
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class)
-public class SORIT {
+public class ImportExecutorIT {
     @Configuration
     @PropertySource("classpath:test.properties")
     @Import(FGRIntegrationTestConfiguration.class)
@@ -69,6 +68,16 @@ public class SORIT {
         @Bean
         public SORDAO sorDao() {
             return new SORDAOImpl();
+        }
+
+        @Bean
+        public SKSDAO<Organisation> shakdao() {
+            return new SHAKDAOImpl();
+        }
+
+        @Bean
+        public SKSDAO<SKSLine> sksdao() {
+            return new GenericSKSLineDAOImpl();
         }
     }
 
@@ -79,22 +88,36 @@ public class SORIT {
     @Autowired
     SORDAO dao;
 
-    @Rule
-    public TemporaryFolder tmpDir = new TemporaryFolder();
-
     @Autowired
-    SORImporter importer;
+    ImportExecutor importExecutor;
 
     @Before
     public void init() {
+        Logger.getLogger(FileFetch.class).setLevel(Level.DEBUG);
+        Logger.getLogger(SORDAOImpl.class).setLevel(Level.DEBUG);
+        Logger.getLogger(ImportExecutor.class).setLevel(Level.DEBUG);
     }
 
     @Test
-    public void canImportTheCorrectNumberOfRecords() throws Throwable {
-        File file = toFile(getClass().getClassLoader().getResource("data/sor/Sor.xml"));
-        System.out.println("testing " + file.getAbsolutePath());
-        importer.process(file, "");
-
-        assertEquals(3802, jdbc.queryForInt("SELECT COUNT(*) FROM Klass_SOR"));
+    public void canImportShakFromRealUrls() throws Throwable {
+        doImport(ImportExecutor.SHAK);
     }
+
+    @Test
+    public void canImportSksFromRealUrls() throws Throwable {
+        doImport(ImportExecutor.SKS);
+    }
+
+    @Test
+    public void canImportSorFromRealUrls() throws Throwable {
+        doImport(ImportExecutor.SOR);
+    }
+
+    public void doImport(String type) {
+        long time = System.currentTimeMillis();
+        System.out.println("running " + type);
+        importExecutor.run(type);
+        System.out.println(type + " done, took " + ((System.currentTimeMillis() - time) / 1000d) + " seconds");
+    }
+
 }

@@ -26,6 +26,9 @@
  */
 package dk.nsi.haiba.fgrimporter.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,9 +57,6 @@ import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.importer.SORImporter;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
-import dk.nsi.haiba.fgrimporter.parser.DirectoryInbox;
-import dk.nsi.haiba.fgrimporter.parser.Inbox;
-import dk.nsi.haiba.fgrimporter.parser.Parser;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepositoryJdbcImpl;
 import dk.nsi.haiba.fgrimporter.status.TimeSource;
@@ -79,6 +79,15 @@ public class FGRConfiguration {
 
     @Value("${dataDir}")
     private String dataDir;
+
+    @Value("${shak.remoteurl}")
+    private String shakRemoteUrl;
+
+    @Value("${sor.remoteurl}")
+    private String sorRemoteUrl;
+
+    @Value("${sks.remoteurl}")
+    private String sksRemoteUrl;
 
     // this is not automatically registered, see https://jira.springsource.org/browse/SPR-8539
     @Bean
@@ -179,19 +188,12 @@ public class FGRConfiguration {
     @Bean
     public SKSParser<Organisation> shakParser() {
         return new SKSParser<Organisation>(Organisation.class, new String[] { Organisation.RECORD_TYPE_DEPARTMENT,
-                Organisation.RECORD_TYPE_HOSPITAL }, new String[] { "SHAKCOMPLETE.TXT", "SHAKDELTA.TXT" },
-                "shakimporter");
+                Organisation.RECORD_TYPE_HOSPITAL });
     }
 
     @Bean
     public SKSParser<SKSLine> sksParser() {
-        return new SKSParser<SKSLine>(SKSLine.class, new String[] { "dia", "pro", "opr", "und" },
-                new String[] { "SKScomplete.txt" }, "sksimporter");
-    }
-
-    @Bean
-    public Inbox inbox() throws Exception {
-        return new DirectoryInbox(dataDir, "fgrparser");
+        return new SKSParser<SKSLine>(SKSLine.class, new String[] { "dia", "pro", "opr", "und" });
     }
 
     @Bean
@@ -202,5 +204,20 @@ public class FGRConfiguration {
     @Bean
     public SLALogger slaLogger() {
         return new SLALogConfig("Stamdata SOR-importer", "sorimporter").getSLALogger();
+    }
+
+    @Bean
+    public URL shakRemoteUrl() throws MalformedURLException {
+        return new URL(shakRemoteUrl);
+    }
+
+    @Bean
+    public URL sksRemoteUrl() throws MalformedURLException {
+        return new URL(sksRemoteUrl);
+    }
+
+    @Bean
+    public URL sorRemoteUrl() throws MalformedURLException {
+        return new URL(sorRemoteUrl);
     }
 }

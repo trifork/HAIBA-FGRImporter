@@ -272,4 +272,16 @@ public class SygehusAfdeling
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "SygehusAfdeling [navn=" + navn + ", eanLokationsnummer=" + eanLokationsnummer + ", nummer=" + nummer
+                + ", telefon=" + telefon + ", vejnavn=" + vejnavn + ", postnummer=" + postnummer + ", bynavn=" + bynavn
+                + ", email=" + email + ", www=" + www + ", afdelingTypeKode=" + afdelingTypeKode
+                + ", afdelingTypeTekst=" + afdelingTypeTekst + ", hovedSpecialeKode=" + hovedSpecialeKode
+                + ", hovedSpecialeTekst=" + hovedSpecialeTekst + ", sorNummer=" + sorNummer + ", sygehusSorNummer="
+                + sygehusSorNummer + ", overAfdelingSorNummer=" + overAfdelingSorNummer
+                + ", underlagtSygehusSorNummer=" + underlagtSygehusSorNummer + ", validFrom=" + validFrom
+                + ", validTo=" + validTo + "]";
+    }
 }

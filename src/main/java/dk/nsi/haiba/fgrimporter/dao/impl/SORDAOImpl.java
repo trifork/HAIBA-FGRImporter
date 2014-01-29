@@ -54,6 +54,7 @@ public class SORDAOImpl implements SORDAO {
 
     @Override
     public void saveSygehuseAfdelinger(Collection<SygehusAfdeling> entities) {
+        log.debug("storing " + entities.size() + " afdelinger");
         for (SygehusAfdeling sa : entities) {
             Long Sor_ID = sa.getSorNummer();
             String SHAK = sa.getNummer();
@@ -81,6 +82,7 @@ public class SORDAOImpl implements SORDAO {
 
     @Override
     public void saveSygehuse(Collection<Sygehus> entities) {
+        log.debug("storing " + entities.size() + " sygehuse");
         for (Sygehus s : entities) {
             Long Sor_ID = s.getSorNummer();
             String SHAK = s.getNummer();

@@ -192,4 +192,12 @@ public class Sygehus
             return false;
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "Sygehus [navn=" + navn + ", eanLokationsnummer=" + eanLokationsnummer + ", nummer=" + nummer
+                + ", telefon=" + telefon + ", vejnavn=" + vejnavn + ", postnummer=" + postnummer + ", bynavn=" + bynavn
+                + ", email=" + email + ", www=" + www + ", sorNummer=" + sorNummer + ", validFrom=" + validFrom
+                + ", validTo=" + validTo + "]";
+    }
 }

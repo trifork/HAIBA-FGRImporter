@@ -115,53 +115,23 @@ public class SKSParser<T extends SKSLine> implements Parser {
 
     private Class<T> sksClass;
 
-    private String home;
-
-    private Set<String> validFileNames;
-
-    public SKSParser(Class<T> clazz, String[] parsablePrefixes, String[] validFileNames, String home) {
+    public SKSParser(Class<T> clazz, String[] parsablePrefixes) {
         sksClass = clazz;
         this.parsablePrefixes = new HashSet<String>(Arrays.asList(parsablePrefixes));
-        this.validFileNames = new HashSet<String>(Arrays.asList(validFileNames));
-        this.home = home;
     }
 
     public Set<T> getEntities() {
         return entities;
     }
 
-    protected boolean validateInputStructure(File datadir) {
-        File[] input = datadir.listFiles();
-
-        Preconditions.checkNotNull(input, "input");
-        Preconditions.checkArgument(input.length > 0, "At least one file should be present at this point.");
-
-        return input.length == 1 && isValidFilePresent(input);
-    }
-
-    private boolean isValidFilePresent(File[] input) {
-        boolean returnValue = false;
-        final String filename = input[0].getName();
-        for (String validFileName : validFileNames) {
-            if (validFileName.equalsIgnoreCase(filename)) {
-                returnValue = true;
-            }
-        }
-        return returnValue;
-    }
-
     @Override
-    public void process(File datadir, String identifier) {
-        Preconditions.checkState(validateInputStructure(datadir), "Input structure is invalid");
+    public void process(File file, String identifier) {
         entities = new HashSet<T>();
-        File[] files = datadir.listFiles();
 
         try {
-            Preconditions.checkArgument(files.length == 1, "Only one file should be present at this point.");
-
             LineIterator lines = null;
             try {
-                lines = FileUtils.lineIterator(files[0], FILE_ENCODING);
+                lines = FileUtils.lineIterator(file, FILE_ENCODING);
 
                 innerParse(lines);
 
@@ -178,11 +148,6 @@ public class SKSParser<T extends SKSLine> implements Parser {
         } catch (RuntimeException e) {
             throw e;
         }
-    }
-
-    @Override
-    public String getHome() {
-        return home;
     }
 
     private void innerParse(Iterator<String> lines) {

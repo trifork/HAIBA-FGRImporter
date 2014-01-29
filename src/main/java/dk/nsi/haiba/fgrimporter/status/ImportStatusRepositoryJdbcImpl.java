@@ -89,7 +89,6 @@ public class ImportStatusRepositoryJdbcImpl extends CommonDAO implements ImportS
 			// MSSQL
 			sql = "SELECT Top 1 Id from FGRImporterStatus WHERE Type = ? ORDER BY StartTime DESC";
 		}
-System.out.println("querying");
 		Long newestOpenId;
 		try {
 			newestOpenId = haibaJdbcTemplate.queryForLong(sql, type);
@@ -97,7 +96,6 @@ System.out.println("querying");
 			log.debug("it seems we do not have any open statuses, let's not update");
 			return;
 		}
-		System.out.println("importEndedAt: newestOpenId="+newestOpenId);
 
 		haibaJdbcTemplate.update("UPDATE FGRImporterStatus SET Type=?, EndTime=?, Outcome=?, ErrorMessage=? WHERE Id=?", type, endTime.toDate(), outcome.toString(), errorMessage, newestOpenId);
 	}

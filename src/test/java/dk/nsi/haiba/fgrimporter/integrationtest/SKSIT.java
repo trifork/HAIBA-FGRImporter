@@ -187,7 +187,7 @@ public class SKSIT {
     }
 
     private <T extends SKSLine> void process(SKSParser<T> parser, SKSDAO<T> dao, String string) throws IOException {
-        parser.process(datasetDirWith(string), "");
+        parser.process(new File(string), "");
         Set<T> entities = parser.getEntities();
         if (entities != null && !entities.isEmpty()) {
             dao.clearTable();
@@ -210,15 +210,5 @@ public class SKSIT {
 //        for (String key : keySet) {
 //            System.out.println("got "+map.get(key).size()+" of '"+key+"'");
 //        }
-    }
-
-    private File datasetDirWith(String filename) throws IOException {
-        File datasetDir = tmpDir.newFolder();
-        FileUtils.copyFileToDirectory(getFile(filename), datasetDir);
-        return datasetDir;
-    }
-
-    private File getFile(String filename) {
-        return toFile(getClass().getClassLoader().getResource(filename));
     }
 }

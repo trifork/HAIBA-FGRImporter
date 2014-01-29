@@ -45,43 +45,38 @@ import dk.nsi.haiba.fgrimporter.model.SKSLine;
 @Transactional("haibaTransactionManager")
 public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> {
 
-	private static Log log = new Log(Logger.getLogger(GenericSKSLineDAOImpl.class));
+    private static Log log = new Log(Logger.getLogger(GenericSKSLineDAOImpl.class));
 
-	@Autowired
-	@Qualifier("haibaJdbcTemplate")
-	JdbcTemplate jdbc;
+    @Autowired
+    @Qualifier("haibaJdbcTemplate")
+    JdbcTemplate jdbc;
 
-	@Override
-	public void saveEntity(SKSLine sks) throws DAOException {
-		try {
-			SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
-			String created = formatter.format(new Date()); 
-			
-			String sql = "INSERT INTO GenericSKS (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '"+created+"', ?, ?)";
+    @Override
+    public void saveEntity(SKSLine sks) throws DAOException {
+        try {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+            String created = formatter.format(new Date());
 
-			Object[] args = new Object[] {
-				sks.getCode(),
-				sks.getText(),
-				sks.getType(),
-				sks.getValidFrom(),
-				sks.getValidTo()
-			};
+            String sql = "INSERT INTO GenericSKS (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
+                    + created + "', ?, ?)";
 
-			jdbc.update(sql, args);
-			
-			log.debug("** Inserted SKSLine");
-		} catch (DataAccessException e) {
-			throw new DAOException(e.getMessage(), e);
-		}
-	}
-	
+            Object[] args = new Object[] { sks.getCode(), sks.getText(), sks.getType(), sks.getValidFrom(),
+                    sks.getValidTo() };
 
-	@Override
-	public void clearTable() throws DAOException {
-	    try {
-			jdbc.update("DELETE FROM GenericSKS");
+            jdbc.update(sql, args);
+
+            log.debug("** Inserted SKSLine");
+        } catch (DataAccessException e) {
+            throw new DAOException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void clearTable() throws DAOException {
+        try {
+            jdbc.update("DELETE FROM GenericSKS");
         } catch (Exception e) {
             throw new DAOException("", e);
         }
-	}
+    }
 }

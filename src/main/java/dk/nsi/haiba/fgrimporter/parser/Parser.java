@@ -48,20 +48,16 @@ public interface Parser {
 	 * Processing consists of four steps:
 	 * <p/>
 	 * <ol>
-	 * <li>Check that all required files are present.</li>
-	 * <li>Check that the import sequence is in order.</li>
-	 * <li>Parse the data set and persisting it accordingly.</li>
+	 * <li>Parse the file and persisting it accordingly.</li>
 	 * <li>Update the version number, in the key value store.</li>
 	 * </ol>
 	 * <p/>
 	 * You should only log on DEBUG level. See {@linkplain Parser parser}.
 	 *
-	 * @param dataSet the root directory of the file set. Data files are contained within the directory.
+	 * @param file to parse
      * @param identifier identifer for this "parse run"
 	 * @throws OutOfSequenceException if the data set is out of sequence in the expected order.
 	 * @throws ParserException        if anything parser specific error happens or unexpected happens.
 	 */
-	void process(File dataSet, String identifier) throws ParserException;
-
-	String getHome();
+	void process(File file, String identifier) throws ParserException;
 }

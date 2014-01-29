@@ -26,27 +26,14 @@
  */
 package dk.nsi.haiba.fgrimporter.importer;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
-import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
-import dk.nsi.haiba.fgrimporter.model.SKSLine;
-
-import java.io.File;
-import java.io.IOException;
-
-import static org.apache.commons.io.FileUtils.toFile;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class SksParserTest {
     private static String completeTxt = "data/sks/SHAKCOMPLETE.TXT";
-    private static String completeXml = "data/sks/SHAKCOMPLETE.XML";
-    private static String delta = "data/sks/SHAKDELTA.TXT";
 
     private SKSParser importer;
 
@@ -56,37 +43,6 @@ public class SksParserTest {
     @Before
     public void setup() {
         importer = new SKSParser<Organisation>(Organisation.class, new String[] { Organisation.RECORD_TYPE_DEPARTMENT,
-            Organisation.RECORD_TYPE_HOSPITAL }, new String[] { "SHAKCOMPLETE.TXT", "SHAKDELTA.TXT" },
-            "shakimporter");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void shouldNotAcceptEmptyInputFileSet() throws IOException {
-        importer.validateInputStructure(tmpDir.newFolder());
-    }
-
-    @Test
-    public void shouldAcceptSKSCompleteTxtFile() throws IOException {
-        assertTrue(importer.validateInputStructure(datasetDirWith(completeTxt)));
-    }
-
-    @Test
-    public void shouldNotAcceptSKSCompleteXmlFile() throws IOException {
-        assertFalse(importer.validateInputStructure(datasetDirWith(completeXml)));
-    }
-
-    @Test
-    public void shouldAcceptSKSDeltaFile() throws IOException {
-        assertTrue(importer.validateInputStructure(datasetDirWith(delta)));
-    }
-
-    private File datasetDirWith(String filename) throws IOException {
-        File datasetDir = tmpDir.newFolder();
-        FileUtils.copyFileToDirectory(getFile(filename), datasetDir);
-        return datasetDir;
-    }
-
-    private File getFile(String filename) {
-        return toFile(getClass().getClassLoader().getResource(filename));
+                Organisation.RECORD_TYPE_HOSPITAL });
     }
 }

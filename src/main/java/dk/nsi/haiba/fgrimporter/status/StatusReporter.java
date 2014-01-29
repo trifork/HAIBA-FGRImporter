@@ -38,11 +38,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
-import dk.nsi.haiba.fgrimporter.importer.SKSParser;
-import dk.nsi.haiba.fgrimporter.model.Organisation;
-import dk.nsi.haiba.fgrimporter.model.SKSLine;
 
 /*
  * This class is responsible for showing a statuspage, this page contains information about the general health of the application.
@@ -56,24 +52,14 @@ public class StatusReporter {
     ImportStatusRepository statusRepo;
 
     @Autowired
-    SKSParser<Organisation> shakParser;
-
-    @Autowired
-    SKSDAO<Organisation> shakDao;
-
-    @Autowired
-    SKSParser<SKSLine> sksParser;
-
-    @Autowired
-    SKSDAO<SKSLine> sksDao;
-
-    @Autowired
     ImportExecutor importExecutor;
 
     @Value("${cron.shak.import.job}")
     String shakcron;
     @Value("${cron.sks.import.job}")
     String skscron;
+    @Value("${cron.sor.import.job}")
+    String sorcron;
 
     @Autowired
     private HttpServletRequest request;
@@ -88,20 +74,31 @@ public class StatusReporter {
         sb.append("</br>------------------</br>");
         sb.append(ImportExecutor.SHAK);
         sb.append("</br>------------------</br>");
-        String manual = handleManual(ImportExecutor.SHAK, request, shakDao, shakParser);
+        String manual = handleManual(ImportExecutor.SHAK, request);
         HttpStatus shakStatus = buildBody(sb, ImportExecutor.SHAK, manual, shakcron);
+        
         sb.append("<br>");
         sb.append("</br>------------------</br>");
         sb.append(ImportExecutor.SKS);
         sb.append("</br>------------------</br>");
-        manual = handleManual(ImportExecutor.SKS, request, sksDao, sksParser);
+        manual = handleManual(ImportExecutor.SKS, request);
         HttpStatus sksStatus = buildBody(sb, ImportExecutor.SKS, manual, skscron);
+
+        sb.append("<br>");
+        sb.append("</br>------------------</br>");
+        sb.append(ImportExecutor.SOR);
+        sb.append("</br>------------------</br>");
+        manual = handleManual(ImportExecutor.SOR, request);
+        HttpStatus sorStatus = buildBody(sb, ImportExecutor.SOR, manual, sorcron);
 
         if (shakStatus != HttpStatus.OK) {
             status = shakStatus;
         }
         if (sksStatus != HttpStatus.OK) {
             status = sksStatus;
+        }
+        if (sorStatus != HttpStatus.OK) {
+            status = sorStatus;
         }
         body = sb.toString();
 
@@ -110,7 +107,7 @@ public class StatusReporter {
         return new ResponseEntity<String>(body, headers, status);
     }
 
-    private String handleManual(final String type, HttpServletRequest request, final SKSDAO dao, final SKSParser parser) {
+    private String handleManual(final String type, HttpServletRequest request) {
         String returnValue = null;
         String manual = request.getParameter("manual_" + type);
         if (manual == null || manual.trim().length() == 0) {
@@ -124,7 +121,7 @@ public class StatusReporter {
                 importExecutor.setManualOverride(type, true);
                 Runnable importer = new Runnable() {
                     public void run() {
-                        importExecutor.doProcess(dao, parser, type);
+                        importExecutor.run(type);
                     }
                 };
                 importer.run();
