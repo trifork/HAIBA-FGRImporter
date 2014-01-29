@@ -36,14 +36,9 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -187,7 +182,7 @@ public class SKSIT {
     }
 
     private <T extends SKSLine> void process(SKSParser<T> parser, SKSDAO<T> dao, String string) throws IOException {
-        parser.process(new File(string), "");
+        parser.process(toFile(getClass().getClassLoader().getResource(string)), "");
         Set<T> entities = parser.getEntities();
         if (entities != null && !entities.isEmpty()) {
             dao.clearTable();
