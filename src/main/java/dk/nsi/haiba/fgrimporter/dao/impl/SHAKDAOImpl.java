@@ -56,7 +56,7 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
 
 		try {
 
-			SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+			SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String created = formatter.format(new Date()); 
 			
 			String sql = "INSERT INTO Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"+created+"', '"+created+"', ?, ?)";
@@ -86,4 +86,10 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
             throw new DAOException("", e);
         }
 	}
+	
+	public static void main(String[] args) {
+	    SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String created = formatter.format(new Date()); 
+        System.out.println(created);
+    }
 }

@@ -234,8 +234,7 @@ public class SOREventHandler extends DefaultHandler
 
     public static Date parseXSDDate(String xmlDate) throws ParseException
     {
-        String datePattern = "yyyy-MM-dd";
-        DateFormat df = new SimpleDateFormat(datePattern);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
 
         return df.parse(xmlDate);
     }

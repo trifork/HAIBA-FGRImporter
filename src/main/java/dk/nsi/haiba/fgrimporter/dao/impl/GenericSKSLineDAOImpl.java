@@ -54,7 +54,7 @@ public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> 
     @Override
     public void saveEntity(SKSLine sks) throws DAOException {
         try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-DD HH:mm:ss");
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String created = formatter.format(new Date());
 
             String sql = "INSERT INTO GenericSKS (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
