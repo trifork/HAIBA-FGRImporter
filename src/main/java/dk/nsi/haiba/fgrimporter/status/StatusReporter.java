@@ -108,7 +108,6 @@ public class StatusReporter {
     }
 
     private String handleManual(final String type, HttpServletRequest request) {
-        String returnValue = null;
         String manual = request.getParameter("manual_" + type);
         if (manual == null || manual.trim().length() == 0) {
             // no value set, use default set in the import executor
@@ -129,7 +128,7 @@ public class StatusReporter {
                 importExecutor.setManualOverride(type, false);
             }
         }
-        return returnValue;
+        return manual;
     }
 
     private HttpStatus buildBody(StringBuilder sb, String type, String manual, String cron) {
@@ -160,7 +159,7 @@ public class StatusReporter {
         sb.append("</br>");
         sb.append("<a href=\"" + url + "?manual_"+type+"=false\">Scheduled start importer</a>");
         sb.append("</br>");
-        if (manual.equalsIgnoreCase("true")) {
+        if ("true".equalsIgnoreCase(manual)) {
             sb.append("status: MANUAL");
         } else {
             // default
