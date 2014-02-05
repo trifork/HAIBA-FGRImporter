@@ -8,11 +8,20 @@ CREATE TABLE Organisation (
 	CreatedDate DATETIME NOT NULL,
 	ModifiedDate DATETIME NOT NULL,
 	ValidFrom DATETIME NOT NULL,
-	ValidTo DATETIME NOT NULL,
+	ValidTo DATETIME NOT NULL
+);
 
-	INDEX (OrganisationPID, ModifiedDate),
-	INDEX (Nummer, ValidTo, ValidFrom)
-)
+CREATE TABLE IF NOT EXISTS GenericSKS (
+    ID BIGINT IDENTITY NOT NULL PRIMARY KEY,
+
+    Code VARCHAR(20) NOT NULL,
+    Text VARCHAR(60),
+    Type VARCHAR(30) NOT NULL,
+
+    Created DATETIME NOT NULL,
+    ValidFrom DATETIME NOT NULL,
+    ValidTo DATETIME NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS FGRImporterStatus (
     Id BIGINT IDENTITY NOT NULL PRIMARY KEY,
@@ -20,8 +29,6 @@ CREATE TABLE IF NOT EXISTS FGRImporterStatus (
     StartTime DATETIME NOT NULL,
     EndTime DATETIME,
     Outcome VARCHAR(20),
-    ErrorMessage VARCHAR(200),
-
-    INDEX (StartTime)
-)
+    ErrorMessage VARCHAR(200)
+);
 
