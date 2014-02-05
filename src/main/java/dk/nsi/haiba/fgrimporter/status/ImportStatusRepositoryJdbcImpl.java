@@ -162,15 +162,13 @@ public class ImportStatusRepositoryJdbcImpl extends CommonDAO implements ImportS
 		}
 	}
 
-	
 	public boolean isHAIBADBAlive() {
 		String sql = null;
-		// TODO - replace todofelt and todotabel with correct field and tablename
 		if(MYSQL.equals(getDialect())) {
-			sql = "SELECT todofelt from todotabel LIMIT 1";
+			sql = "SELECT Id from FGRImporterStatus LIMIT 1";
 		} else {
 			// MSSQL
-			sql = "SELECT Top 1 todofelt from todotabel";
+			sql = "SELECT Top 1 Id from FGRImporterStatus";
 		}
 
 		try {
