@@ -95,7 +95,7 @@ public class FGRConfiguration {
 
         propertySourcesPlaceholderConfigurer
                 .setLocations(new Resource[] { new ClassPathResource("default-config.properties"),
-                        new ClassPathResource("epimibaconfig.properties") });
+                        new ClassPathResource("fgrconfig.properties") });
 
         return propertySourcesPlaceholderConfigurer;
     }
