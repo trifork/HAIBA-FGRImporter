@@ -77,9 +77,6 @@ public class FGRConfiguration {
     @Value("${jdbc.classJNDIName}")
     private String classJdbcJNDIName;
 
-    @Value("${dataDir}")
-    private String dataDir;
-
     @Value("${shak.remoteurl}")
     private String shakRemoteUrl;
 
