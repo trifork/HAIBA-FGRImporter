@@ -84,8 +84,9 @@ public class ImportExecutor {
     @Autowired
     SKSDAO<SKSLine> sksDao;
 
-    public void run(String type) {
-        log.debug("running " + type);
+    public void runManual(String type) {
+        log.debug("running " + type + " manually");
+        setManualOverride(type, true);
         if (SOR.equals(type)) {
             runSor();
         } else if (SKS.equals(type)) {
@@ -98,37 +99,57 @@ public class ImportExecutor {
     }
 
     @Scheduled(cron = "${cron.sor.import.job}")
-    public void runSor() {
+    public void cronSor() {
         if (!isManualOverride(SOR)) {
-            log.debug("Running sor Importer: " + new Date().toString());
-            File destination = resolveDestinationFile(SOR, sorRemoteUrl);
-            boolean fetched = FileFetch.fetch(sorRemoteUrl, destination);
-            if (fetched) {
-                sorParser.process(destination, SOR);
-            }
+            runSor();
         } else {
             log.debug("Sor importer must be started manually");
         }
     }
 
+    public void runSor() {
+        log.debug("Running sor Importer: " + new Date().toString());
+        statusRepo.importStartedAt(new DateTime(), SOR);
+        File destination = resolveDestinationFile(SOR, sorRemoteUrl);
+        boolean fetched = FileFetch.fetch(sorRemoteUrl, destination);
+        if (fetched) {
+            try {
+                sorParser.process(destination, SOR);
+                statusRepo.importEndedWithSuccess(new DateTime(), SOR);
+            } catch (Exception e) {
+                statusRepo.importEndedWithFailure(new DateTime(), e.getMessage(), SOR);
+            }
+        } else {
+            statusRepo.importEndedWithFailure(new DateTime(), "file fetch failed from " + sorRemoteUrl, SOR);
+        }
+    }
+
     @Scheduled(cron = "${cron.shak.import.job}")
-    public void runShak() {
+    public void cronShak() {
         if (!isManualOverride(SHAK)) {
-            log.debug("Running shak Importer: " + new Date().toString());
-            doProcess(shakDao, shakParser, SHAK, shakRemoteUrl);
+            runShak();
         } else {
             log.debug("Shak importer must be started manually");
         }
     }
 
+    public void runShak() {
+        log.debug("Running shak Importer: " + new Date().toString());
+        doProcess(shakDao, shakParser, SHAK, shakRemoteUrl);
+    }
+
     @Scheduled(cron = "${cron.sks.import.job}")
-    public void runSks() {
-        if (!isManualOverride("sks")) {
-            log.debug("Running sks Importer: " + new Date().toString());
-            doProcess(sksDao, sksParser, SKS, sksRemoteUrl);
+    public void cronSks() {
+        if (!isManualOverride(SKS)) {
+            runSks();
         } else {
             log.debug("Sks importer must be started manually");
         }
+    }
+
+    public void runSks() {
+        log.debug("Running sks Importer: " + new Date().toString());
+        doProcess(sksDao, sksParser, SKS, sksRemoteUrl);
     }
 
     /*
@@ -149,7 +170,7 @@ public class ImportExecutor {
                     for (T t : entities) {
                         dao.saveEntity(t);
                     }
-                    log.debug("stored " + entities.size()+" for " + type);
+                    log.debug("stored " + entities.size() + " for " + type);
                 }
 
                 statusRepo.importEndedWithSuccess(new DateTime(), type);

@@ -116,7 +116,7 @@ public class ImportExecutorIT {
     public void doImport(String type) {
         long time = System.currentTimeMillis();
         System.out.println("running " + type);
-        importExecutor.run(type);
+        importExecutor.runManual(type);
         System.out.println(type + " done, took " + ((System.currentTimeMillis() - time) / 1000d) + " seconds");
     }
 

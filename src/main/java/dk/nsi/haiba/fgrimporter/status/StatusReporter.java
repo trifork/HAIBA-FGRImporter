@@ -76,7 +76,7 @@ public class StatusReporter {
         sb.append("</br>------------------</br>");
         String manual = handleManual(ImportExecutor.SHAK, request);
         HttpStatus shakStatus = buildBody(sb, ImportExecutor.SHAK, manual, shakcron);
-        
+
         sb.append("<br>");
         sb.append("</br>------------------</br>");
         sb.append(ImportExecutor.SKS);
@@ -116,14 +116,7 @@ public class StatusReporter {
             // manual flag is set on the request
             if (manual.equalsIgnoreCase("true")) {
                 // flag is true, start the importer in a new thread
-                // XXX not a new thread
-                importExecutor.setManualOverride(type, true);
-                Runnable importer = new Runnable() {
-                    public void run() {
-                        importExecutor.run(type);
-                    }
-                };
-                importer.run();
+                importExecutor.runManual(type);
             } else {
                 importExecutor.setManualOverride(type, false);
             }
@@ -155,9 +148,9 @@ public class StatusReporter {
 
         String url = request.getRequestURL().toString();
 
-        sb.append("<a href=\"" + url + "?manual_"+type+"=true\">Manual start importer</a>");
+        sb.append("<a href=\"" + url + "?manual_" + type + "=true\">Manual start importer</a>");
         sb.append("</br>");
-        sb.append("<a href=\"" + url + "?manual_"+type+"=false\">Scheduled start importer</a>");
+        sb.append("<a href=\"" + url + "?manual_" + type + "=false\">Scheduled start importer</a>");
         sb.append("</br>");
         if ("true".equalsIgnoreCase(manual)) {
             sb.append("status: MANUAL");
