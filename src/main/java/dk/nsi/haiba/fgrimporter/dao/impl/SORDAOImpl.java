@@ -60,17 +60,8 @@ public class SORDAOImpl implements SORDAO {
             String SHAK = sa.getNummer();
             if (Sor_ID != null && SHAK != null) {
                 try {
-                    // @formatter:off
-            String sql = ""
-                    + "INSERT INTO Klass_SOR "
-                    + "            (Sor_ID, "
-                    + "             SHAK) "
-                    + "VALUES      (?, ?)";
-            jdbc.update(sql,
-                     Sor_ID, 
-                     SHAK
-                     );
-             // @formatter:on}
+                    String sql = "INSERT INTO Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
+                    jdbc.update(sql, Sor_ID, SHAK);
                 } catch (DataAccessException e) {
                     throw new DAOException(e.getMessage(), e);
                 }
@@ -88,17 +79,8 @@ public class SORDAOImpl implements SORDAO {
             String SHAK = s.getNummer();
             if (Sor_ID != null && SHAK != null) {
                 try {
-                    // @formatter:off
-            String sql = ""
-                    + "INSERT INTO Klass_SOR "
-                    + "            (Sor_ID, "
-                    + "             SHAK) "
-                    + "VALUES      (?, ?)";
-            jdbc.update(sql,
-                     Sor_ID, 
-                     SHAK
-                     );
-             // @formatter:on}
+                    String sql = "INSERT INTO Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
+                    jdbc.update(sql, Sor_ID, SHAK);
                 } catch (DataAccessException e) {
                     throw new DAOException(e.getMessage(), e);
                 }
