@@ -32,6 +32,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,14 +52,18 @@ public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> 
     @Qualifier("haibaJdbcTemplate")
     JdbcTemplate jdbc;
 
+    @Value("${jdbc.haibatableprefix:}")
+    String tableprefix;
+
     @Override
     public void saveEntity(SKSLine sks) throws DAOException {
         try {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String created = formatter.format(new Date());
 
-            String sql = "INSERT INTO GenericSKS (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
-                    + created + "', ?, ?)";
+            String sql = "INSERT INTO " + tableprefix
+                    + "GenericSKS (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '" + created
+                    + "', ?, ?)";
 
             Object[] args = new Object[] { sks.getCode(), sks.getText(), sks.getType(), sks.getValidFrom(),
                     sks.getValidTo() };
@@ -74,7 +79,7 @@ public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> 
     @Override
     public void clearTable() throws DAOException {
         try {
-            jdbc.update("DELETE FROM GenericSKS");
+            jdbc.update("DELETE FROM " + tableprefix + "GenericSKS");
         } catch (Exception e) {
             throw new DAOException("", e);
         }

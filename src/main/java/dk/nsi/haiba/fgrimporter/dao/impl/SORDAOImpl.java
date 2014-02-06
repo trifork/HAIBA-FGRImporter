@@ -31,6 +31,7 @@ import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -47,9 +48,12 @@ public class SORDAOImpl implements SORDAO {
     @Qualifier("classJdbcTemplate")
     JdbcTemplate jdbc;
 
+    @Value("${jdbc.haibatableprefix:}")
+    String tableprefix;
+
     @Override
     public void clear() {
-        jdbc.update("TRUNCATE TABLE Klass_SOR");
+        jdbc.update("TRUNCATE TABLE " + tableprefix + "Klass_SOR");
     }
 
     @Override
@@ -60,7 +64,7 @@ public class SORDAOImpl implements SORDAO {
             String SHAK = sa.getNummer();
             if (Sor_ID != null && SHAK != null) {
                 try {
-                    String sql = "INSERT INTO Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
+                    String sql = "INSERT INTO " + tableprefix + "Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
                     jdbc.update(sql, Sor_ID, SHAK);
                 } catch (DataAccessException e) {
                     throw new DAOException(e.getMessage(), e);
@@ -79,7 +83,7 @@ public class SORDAOImpl implements SORDAO {
             String SHAK = s.getNummer();
             if (Sor_ID != null && SHAK != null) {
                 try {
-                    String sql = "INSERT INTO Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
+                    String sql = "INSERT INTO " + tableprefix + "Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
                     jdbc.update(sql, Sor_ID, SHAK);
                 } catch (DataAccessException e) {
                     throw new DAOException(e.getMessage(), e);

@@ -32,6 +32,7 @@ import java.util.Date;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,51 +46,51 @@ import dk.nsi.haiba.fgrimporter.model.Organisation;
 @Transactional("haibaTransactionManager")
 public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
 
-	private static Log log = new Log(Logger.getLogger(SHAKDAOImpl.class));
+    private static Log log = new Log(Logger.getLogger(SHAKDAOImpl.class));
 
-	@Autowired
-	@Qualifier("haibaJdbcTemplate")
-	JdbcTemplate jdbc;
+    @Autowired
+    @Qualifier("haibaJdbcTemplate")
+    JdbcTemplate jdbc;
 
-	@Override
-	public void saveEntity(Organisation org) throws DAOException {
+    @Value("${jdbc.haibatableprefix:}")
+    String tableprefix;
+    
+    @Override
+    public void saveEntity(Organisation org) throws DAOException {
 
-		try {
+        try {
 
-			SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			String created = formatter.format(new Date()); 
-			
-			String sql = "INSERT INTO Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"+created+"', '"+created+"', ?, ?)";
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String created = formatter.format(new Date());
 
-			Object[] args = new Object[] {
-				org.getCode(),
-				org.getText(),
-				org.getOrganisationstype(),
-				org.getValidFrom(),
-				org.getValidTo()
-			};
+            String sql = "INSERT INTO "
+                    + tableprefix
+                    + "Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
+                    + created + "', '" + created + "', ?, ?)";
 
-			jdbc.update(sql, args);
-			
-			log.debug("** Inserted Organisation");
-		} catch (DataAccessException e) {
-			throw new DAOException(e.getMessage(), e);
-		}
-	}
-	
+            Object[] args = new Object[] { org.getCode(), org.getText(), org.getOrganisationstype(),
+                    org.getValidFrom(), org.getValidTo() };
 
-	@Override
-	public void clearTable() throws DAOException {
-	    try {
-			jdbc.update("DELETE FROM Organisation");
+            jdbc.update(sql, args);
+
+            log.debug("** Inserted Organisation");
+        } catch (DataAccessException e) {
+            throw new DAOException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void clearTable() throws DAOException {
+        try {
+            jdbc.update("DELETE FROM " + tableprefix + "Organisation");
         } catch (Exception e) {
             throw new DAOException("", e);
         }
-	}
-	
-	public static void main(String[] args) {
-	    SimpleDateFormat formatter =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String created = formatter.format(new Date()); 
+    }
+
+    public static void main(String[] args) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String created = formatter.format(new Date());
         System.out.println(created);
     }
 }
