@@ -45,7 +45,7 @@ public class SORDAOImpl implements SORDAO {
     private static Log log = new Log(Logger.getLogger(SORDAOImpl.class));
 
     @Autowired
-    @Qualifier("classJdbcTemplate")
+    @Qualifier("haibaJdbcTemplate")
     JdbcTemplate jdbc;
 
     @Value("${jdbc.haibatableprefix:}")

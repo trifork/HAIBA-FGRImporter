@@ -74,9 +74,6 @@ public class FGRConfiguration {
     @Value("${jdbc.haibaJNDIName}")
     private String haibaJdbcJNDIName;
 
-    @Value("${jdbc.classJNDIName}")
-    private String classJdbcJNDIName;
-
     @Value("${shak.remoteurl}")
     private String shakRemoteUrl;
 
@@ -111,22 +108,7 @@ public class FGRConfiguration {
     }
 
     @Bean
-    @Qualifier("classDataSource")
-    public DataSource classDataSource() throws Exception {
-        JndiObjectFactoryBean factory = new JndiObjectFactoryBean();
-        factory.setJndiName(classJdbcJNDIName);
-        factory.setExpectedType(DataSource.class);
-        factory.afterPropertiesSet();
-        return (DataSource) factory.getObject();
-    }
-
-    @Bean
     public JdbcTemplate haibaJdbcTemplate(@Qualifier("haibaDataSource") DataSource ds) {
-        return new JdbcTemplate(ds);
-    }
-
-    @Bean
-    public JdbcTemplate classJdbcTemplate(@Qualifier("classDataSource") DataSource ds) {
         return new JdbcTemplate(ds);
     }
 
