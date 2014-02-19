@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import dk.nsi.haiba.fgrimporter.dao.CommonDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
@@ -43,9 +42,7 @@ import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
 
-@Transactional("haibaTransactionManager")
 public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> {
-
     private static Log log = new Log(Logger.getLogger(GenericSKSLineDAOImpl.class));
 
     @Autowired

@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import dk.nsi.haiba.fgrimporter.dao.CommonDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
@@ -43,9 +42,7 @@ import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
 
-@Transactional("haibaTransactionManager")
 public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
-
     private static Log log = new Log(Logger.getLogger(SHAKDAOImpl.class));
 
     @Autowired
@@ -57,9 +54,7 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
     
     @Override
     public void saveEntity(Organisation org) throws DAOException {
-
         try {
-
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String created = formatter.format(new Date());
 
@@ -72,7 +67,6 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
                     org.getValidFrom(), org.getValidTo() };
 
             jdbc.update(sql, args);
-
             log.debug("** Inserted Organisation");
         } catch (DataAccessException e) {
             throw new DAOException(e.getMessage(), e);
