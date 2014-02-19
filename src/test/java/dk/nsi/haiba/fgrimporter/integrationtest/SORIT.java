@@ -93,6 +93,6 @@ public class SORIT {
         System.out.println("testing " + file.getAbsolutePath());
         importer.process(file, "");
 
-        assertEquals(3802, jdbc.queryForInt("SELECT COUNT(*) FROM Klass_SOR"));
+        assertEquals(3802, jdbc.queryForInt("SELECT COUNT(*) FROM Anvendt_Klass_SOR"));
     }
 }
