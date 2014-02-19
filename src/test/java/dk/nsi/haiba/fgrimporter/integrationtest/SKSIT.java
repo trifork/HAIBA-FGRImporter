@@ -31,7 +31,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -116,14 +115,14 @@ public class SKSIT {
         // FIXME: These record counts are only correct iff if duplicate keys are disregarted.
         // This is unfortunate. Keys are currently only considered based their SKSKode.
         // They should be a combination of type + kode + startdato based on the register doc.
-        assertEquals(745, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Sygehus'"));
-        assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM Organisation WHERE Organisationstype = 'Afdeling'"));
+        assertEquals(745, jdbc.queryForInt("SELECT COUNT(*) FROM klass_shak WHERE Organisationstype = 'Sygehus'"));
+        assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM klass_shak WHERE Organisationstype = 'Afdeling'"));
 
         process(sksParser, sksDao, "data/sks/SKScomplete.txt");
-        assertEquals(573, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'und'"));
-        assertEquals(8930, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'pro'"));
-        assertEquals(42222, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'dia'"));
-        assertEquals(19955, jdbc.queryForInt("SELECT COUNT(*) FROM GenericSKS WHERE Type = 'opr'"));
+        assertEquals(573, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'und'"));
+        assertEquals(8930, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'pro'"));
+        assertEquals(42222, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'dia'"));
+        assertEquals(19955, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'opr'"));
     }
 
     @Test
@@ -135,8 +134,8 @@ public class SKSIT {
         process(shakParser, shakDao, "data/sks/SHAKCOMPLETE.TXT");
         process(sksParser, sksDao, "data/sks/SKScomplete.txt");
 
-        Date validTo = jdbc.queryForObject("SELECT ValidTo FROM Organisation WHERE Navn='Rigshospitalet'", Date.class);
-        Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM Organisation WHERE Navn='Rigshospitalet'",
+        Date validTo = jdbc.queryForObject("SELECT ValidTo FROM klass_shak WHERE Navn='Rigshospitalet'", Date.class);
+        Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM klass_shak WHERE Navn='Rigshospitalet'",
                 Date.class);
 
         Date lastValidTo = formatter.parse("2500-01-01 23:59:58"); // 2500-01-02 00:00:00.0
@@ -149,8 +148,8 @@ public class SKSIT {
         assertTrue(validFrom.after(lastInvalidBefore));
         assertTrue(validFrom.before(firstValidFrom));
 
-        validTo = jdbc.queryForObject("SELECT ValidTo FROM GenericSKS WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'", Date.class);
-        validFrom = jdbc.queryForObject("SELECT ValidFrom FROM GenericSKS WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'",
+        validTo = jdbc.queryForObject("SELECT ValidTo FROM klass_sks WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'", Date.class);
+        validFrom = jdbc.queryForObject("SELECT ValidFrom FROM klass_sks WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'",
                 Date.class);
         // from 201201012 to 25000101
         assertEquals(new Date(validFrom.getTime()), new Date(formatter.parse("2012-01-01 00:00:00").getTime()));
@@ -161,10 +160,10 @@ public class SKSIT {
     public void updatesValidToAndModifiedDate() throws IOException, InterruptedException {
         process(shakParser, shakDao, "data/sks/SHAKCOMPLETE.TXT");
         Timestamp timestamp = new Timestamp((new Date()).getTime());
-        Timestamp modified1 = jdbc.queryForObject("SELECT ModifiedDate FROM Organisation LIMIT 1", Timestamp.class);
+        Timestamp modified1 = jdbc.queryForObject("SELECT ModifiedDate FROM klass_shak LIMIT 1", Timestamp.class);
 
         // Check no records are invalidated
-        long cntFirstImport = jdbc.queryForLong("SELECT count(1) FROM Organisation WHERE ValidTo<=?", timestamp);
+        long cntFirstImport = jdbc.queryForLong("SELECT count(1) FROM klass_shak WHERE ValidTo<=?", timestamp);
 
         // Check no invalid records exist
         Thread.sleep(1000);
@@ -172,12 +171,12 @@ public class SKSIT {
         timestamp = new Timestamp((new Date()).getTime());
 
         // Check some records have been invalidated
-        long cntSecondImport = jdbc.queryForLong("SELECT count(1) FROM Organisation WHERE ValidTo<=?", timestamp);
+        long cntSecondImport = jdbc.queryForLong("SELECT count(1) FROM klass_shak WHERE ValidTo<=?", timestamp);
         assertTrue(cntSecondImport > cntFirstImport);
 
         // Check modified date has changed
         Timestamp modified2 = jdbc.queryForObject(
-                "SELECT ModifiedDate FROM Organisation ORDER BY ModifiedDate DESC LIMIT 1", Timestamp.class);
+                "SELECT ModifiedDate FROM klass_shak ORDER BY ModifiedDate DESC LIMIT 1", Timestamp.class);
         assertFalse(modified1.equals(modified2));
     }
 

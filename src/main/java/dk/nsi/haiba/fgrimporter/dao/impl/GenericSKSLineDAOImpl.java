@@ -62,7 +62,7 @@ public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> 
             String created = formatter.format(new Date());
 
             String sql = "INSERT INTO " + tableprefix
-                    + "GenericSKS (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '" + created
+                    + "klass_sks (Code, Text, Type, Created, ValidFrom, ValidTo) VALUES (?, ?, ?, '" + created
                     + "', ?, ?)";
 
             Object[] args = new Object[] { sks.getCode(), sks.getText(), sks.getType(), sks.getValidFrom(),
@@ -79,7 +79,7 @@ public class GenericSKSLineDAOImpl extends CommonDAO implements SKSDAO<SKSLine> 
     @Override
     public void clearTable() throws DAOException {
         try {
-            jdbc.update("DELETE FROM " + tableprefix + "GenericSKS");
+            jdbc.update("DELETE FROM " + tableprefix + "klass_sks");
         } catch (Exception e) {
             throw new DAOException("", e);
         }

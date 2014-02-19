@@ -65,7 +65,7 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
 
             String sql = "INSERT INTO "
                     + tableprefix
-                    + "Organisation (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
+                    + "klass_shak (Nummer, Navn, Organisationstype, CreatedDate, ModifiedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
                     + created + "', '" + created + "', ?, ?)";
 
             Object[] args = new Object[] { org.getCode(), org.getText(), org.getOrganisationstype(),
@@ -82,7 +82,7 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
     @Override
     public void clearTable() throws DAOException {
         try {
-            jdbc.update("DELETE FROM " + tableprefix + "Organisation");
+            jdbc.update("DELETE FROM " + tableprefix + "klass_shak");
         } catch (Exception e) {
             throw new DAOException("", e);
         }

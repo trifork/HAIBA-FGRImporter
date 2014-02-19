@@ -77,8 +77,9 @@ public class SORImporter implements Parser {
         try {
             long processed = 0;
             MDC.put("filename", file.getName());
-
+            
             SORDataSets dataSets = parse(file);
+            dao.clear();
             dao.saveSygehuse(dataSets.getSygehusDS());
             processed += dataSets.getSygehusDS().size();
             dao.saveSygehuseAfdelinger(dataSets.getSygehusAfdelingDS());

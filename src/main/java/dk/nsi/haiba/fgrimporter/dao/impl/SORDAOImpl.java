@@ -53,7 +53,7 @@ public class SORDAOImpl implements SORDAO {
 
     @Override
     public void clear() {
-        jdbc.update("TRUNCATE TABLE " + tableprefix + "Klass_SOR");
+        jdbc.update("DELETE FROM " + tableprefix + "Klass_SOR");
     }
 
     @Override
@@ -83,7 +83,7 @@ public class SORDAOImpl implements SORDAO {
             String SHAK = s.getNummer();
             if (Sor_ID != null && SHAK != null) {
                 try {
-                    String sql = "INSERT INTO " + tableprefix + "Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
+                    String sql = "INSERT INTO " + tableprefix + "Anvendt_Klass_SOR (Sor_ID, SHAK) VALUES (?, ?)";
                     jdbc.update(sql, Sor_ID, SHAK);
                 } catch (DataAccessException e) {
                     throw new DAOException(e.getMessage(), e);
