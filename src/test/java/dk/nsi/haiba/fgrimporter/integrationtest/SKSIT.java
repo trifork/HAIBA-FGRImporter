@@ -156,30 +156,6 @@ public class SKSIT {
         assertEquals(new Date(validTo.getTime()), new Date(formatter.parse("2500-01-02 00:00:00").getTime()));
     }
 
-    @Test
-    public void updatesValidToAndModifiedDate() throws IOException, InterruptedException {
-        process(shakParser, shakDao, "data/sks/SHAKCOMPLETE.TXT");
-        Timestamp timestamp = new Timestamp((new Date()).getTime());
-        Timestamp modified1 = jdbc.queryForObject("SELECT ModifiedDate FROM klass_shak LIMIT 1", Timestamp.class);
-
-        // Check no records are invalidated
-        long cntFirstImport = jdbc.queryForLong("SELECT count(1) FROM klass_shak WHERE ValidTo<=?", timestamp);
-
-        // Check no invalid records exist
-        Thread.sleep(1000);
-        process(shakParser, shakDao, "data/sks2/SHAKCOMPLETE.TXT");
-        timestamp = new Timestamp((new Date()).getTime());
-
-        // Check some records have been invalidated
-        long cntSecondImport = jdbc.queryForLong("SELECT count(1) FROM klass_shak WHERE ValidTo<=?", timestamp);
-        assertTrue(cntSecondImport > cntFirstImport);
-
-        // Check modified date has changed
-        Timestamp modified2 = jdbc.queryForObject(
-                "SELECT ModifiedDate FROM klass_shak ORDER BY ModifiedDate DESC LIMIT 1", Timestamp.class);
-        assertFalse(modified1.equals(modified2));
-    }
-
     private <T extends SKSLine> void process(SKSParser<T> parser, SKSDAO<T> dao, String string) throws IOException {
         parser.process(toFile(getClass().getClassLoader().getResource(string)), "");
         Set<T> entities = parser.getEntities();
