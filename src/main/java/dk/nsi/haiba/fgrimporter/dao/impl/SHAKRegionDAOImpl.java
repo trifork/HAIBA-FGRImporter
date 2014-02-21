@@ -26,10 +26,11 @@
  */
 package dk.nsi.haiba.fgrimporter.dao.impl;
 
-import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,13 +38,13 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import dk.nsi.haiba.fgrimporter.dao.CommonDAO;
-import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
+import dk.nsi.haiba.fgrimporter.dao.SHAKRegionDAO;
 import dk.nsi.haiba.fgrimporter.exception.DAOException;
 import dk.nsi.haiba.fgrimporter.log.Log;
-import dk.nsi.haiba.fgrimporter.model.Organisation;
+import dk.nsi.haiba.fgrimporter.model.ShakRegion;
 
-public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
-    private static Log log = new Log(Logger.getLogger(SHAKDAOImpl.class));
+public class SHAKRegionDAOImpl extends CommonDAO implements SHAKRegionDAO {
+    private static Log log = new Log(Logger.getLogger(SHAKRegionDAOImpl.class));
 
     @Autowired
     @Qualifier("haibaJdbcTemplate")
@@ -51,40 +52,29 @@ public class SHAKDAOImpl extends CommonDAO implements SKSDAO<Organisation> {
 
     @Value("${jdbc.haibatableprefix:}")
     String tableprefix;
-    
-    @Override
-    public void saveEntity(Organisation org) throws DAOException {
-        try {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            String created = formatter.format(new Date());
-
-            String sql = "INSERT INTO "
-                    + tableprefix
-                    + "klass_shak (Nummer, Navn, Organisationstype, CreatedDate, ValidFrom, ValidTo) VALUES (?, ?, ?, '"
-                    + created + "', ?, ?)";
-
-            Object[] args = new Object[] { org.getCode(), org.getText(), org.getOrganisationstype(),
-                    org.getValidFrom(), org.getValidTo() };
-
-            jdbc.update(sql, args);
-            log.debug("** Inserted Organisation");
-        } catch (DataAccessException e) {
-            throw new DAOException(e.getMessage(), e);
-        }
-    }
 
     @Override
-    public void clearTable() throws DAOException {
-        try {
-            jdbc.update("DELETE FROM " + tableprefix + "klass_shak");
-        } catch (Exception e) {
-            throw new DAOException("", e);
-        }
-    }
+    public void saveShakRegions(Collection<ShakRegion> shakRegions) throws DAOException {
+        log.debug("saveShakRegions: testing with " + shakRegions.size() + " ShakRegions");
+        for (ShakRegion shakRegion : shakRegions) {
+            try {
+                String sql = "UPDATE "
+                        + tableprefix
+                        + "klass_shak SET Ejerforhold=?, Institutionsart=?, Regionskode=? WHERE Nummer = ? AND ValidFrom = ? AND ValidTo = ?";
 
-    public static void main(String[] args) {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String created = formatter.format(new Date());
-        System.out.println(created);
+                Date datotil = shakRegion.getDatotil();
+                // add another day as in klass_shak
+                DateTime dt = new DateTime(datotil.getTime()).plusDays(1);
+                datotil = dt.toDate();
+                Object[] args = new Object[] { shakRegion.getEjerforhold(), shakRegion.getInstitutionsart(),
+                        shakRegion.getRegionskode(), shakRegion.getSHAKkode(), shakRegion.getDatoFra(), datotil };
+
+                int update = jdbc.update(sql, args);
+                log.trace("update=" + update + " for " + shakRegion);
+            } catch (DataAccessException e) {
+                log.error("not able to insert shakRegion " + shakRegion, e);
+                throw new DAOException(e.getMessage(), e);
+            }
+        }
     }
 }

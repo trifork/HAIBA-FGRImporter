@@ -26,6 +26,15 @@
  */
 package dk.nsi.haiba.fgrimporter.integrationtest;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Before;
@@ -42,16 +51,20 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.transaction.annotation.Transactional;
+import org.xml.sax.SAXException;
 
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
+import dk.nsi.haiba.fgrimporter.dao.impl.SHAKRegionDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SORDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.FileFetch;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
+import dk.nsi.haiba.fgrimporter.importer.ShakRegionImporter;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
+import dk.nsi.haiba.fgrimporter.model.ShakRegion;
 
 /*
  * Tests the HAIBADAO class
@@ -96,6 +109,19 @@ public class ImportExecutorIT {
         Logger.getLogger(FileFetch.class).setLevel(Level.DEBUG);
         Logger.getLogger(SORDAOImpl.class).setLevel(Level.DEBUG);
         Logger.getLogger(ImportExecutor.class).setLevel(Level.DEBUG);
+        Logger.getLogger(SHAKRegionDAOImpl.class).setLevel(Level.DEBUG);
+    }
+
+    @Test
+    public void canParseShakRegion() throws Throwable {
+        ShakRegionImporter i = new ShakRegionImporter();
+        File file = new File("shakregion/SHAKregion.xml");
+        Collection<ShakRegion> parse = i.parse(file);
+        assertTrue(!parse.isEmpty());
+        ShakRegion next = parse.iterator().next();
+        assertNotNull(next);
+        assertNotNull(next.getEjerforhold());
+        assertNotNull(next.getSHAKkode());
     }
 
     @Test

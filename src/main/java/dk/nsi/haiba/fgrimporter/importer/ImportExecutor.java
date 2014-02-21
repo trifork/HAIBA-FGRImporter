@@ -38,6 +38,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import dk.nsi.haiba.fgrimporter.dao.SHAKRegionDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
@@ -51,6 +52,7 @@ import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
 public class ImportExecutor {
     private static Log log = new Log(Logger.getLogger(ImportExecutor.class));
 
+    public static final String SHAKREGION = "shakregion";
     public static final String SHAK = "shak";
     public static final String SKS = "sks";
     public static final String SOR = "sor";
@@ -59,6 +61,9 @@ public class ImportExecutor {
 
     @Autowired
     private URL shakRemoteUrl;
+
+    @Autowired
+    private URL shakRegionRemoteUrl;
 
     @Autowired
     private URL sorRemoteUrl;
@@ -74,9 +79,15 @@ public class ImportExecutor {
 
     @Autowired
     SKSParser<Organisation> shakParser;
+    
+    @Autowired
+    Parser shakRegionParser;
 
     @Autowired
     SKSDAO<Organisation> shakDao;
+    
+    @Autowired
+    SHAKRegionDAO shakRegionDao;
 
     @Autowired
     SKSParser<SKSLine> sksParser;
@@ -136,6 +147,20 @@ public class ImportExecutor {
     public void runShak() {
         log.debug("Running shak Importer: " + new Date().toString());
         doProcess(shakDao, shakParser, SHAK, shakRemoteUrl);
+        // post process, add values from SHAKRegion
+        statusRepo.importStartedAt(new DateTime(), SHAKREGION);
+        File destination = resolveDestinationFile(SHAKREGION, shakRegionRemoteUrl);
+        boolean fetched = FileFetch.fetch(shakRegionRemoteUrl, destination);
+        if (fetched) {
+            try {
+                shakRegionParser.process(destination, SHAKREGION);
+                statusRepo.importEndedWithSuccess(new DateTime(), SHAKREGION);
+            } catch (Exception e) {
+                statusRepo.importEndedWithFailure(new DateTime(), e.getMessage(), SHAKREGION);
+            }
+        } else {
+            statusRepo.importEndedWithFailure(new DateTime(), "file fetch failed from " + shakRegionRemoteUrl, SHAKREGION);
+        }
     }
 
     @Scheduled(cron = "${cron.sks.import.job}")

@@ -1,17 +1,19 @@
-CREATE TABLE Organisation (
+CREATE TABLE klass_shak (
 	OrganisationPID BIGINT IDENTITY NOT NULL PRIMARY KEY,
 
 	Nummer VARCHAR(20) NOT NULL,
 	Navn VARCHAR(60),
 	Organisationstype VARCHAR(30) NOT NULL,
-
+    Ejerforhold VARCHAR(20),
+    Institutionsart VARCHAR(20),
+    Regionskode VARCHAR(20),
+    
 	CreatedDate DATETIME NOT NULL,
-	ModifiedDate DATETIME NOT NULL,
 	ValidFrom DATETIME NOT NULL,
 	ValidTo DATETIME NOT NULL
 );
 
-CREATE TABLE GenericSKS (
+CREATE TABLE klass_sks (
     ID BIGINT IDENTITY NOT NULL PRIMARY KEY,
 
     Code VARCHAR(20) NOT NULL,

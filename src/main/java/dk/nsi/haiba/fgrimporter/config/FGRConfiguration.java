@@ -47,14 +47,17 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import dk.nsi.haiba.fgrimporter.dao.SHAKRegionDAO;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.SORDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
+import dk.nsi.haiba.fgrimporter.dao.impl.SHAKRegionDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SORDAOImpl;
 import dk.nsi.haiba.fgrimporter.importer.ImportExecutor;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.importer.SORImporter;
+import dk.nsi.haiba.fgrimporter.importer.ShakRegionImporter;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
 import dk.nsi.haiba.fgrimporter.status.ImportStatusRepository;
@@ -76,6 +79,9 @@ public class FGRConfiguration {
 
     @Value("${shak.remoteurl}")
     private String shakRemoteUrl;
+    
+    @Value("${shak.region.remoteurl}")
+    private String shakRegionRemoteUrl;
 
     @Value("${sor.remoteurl}")
     private String sorRemoteUrl;
@@ -155,6 +161,11 @@ public class FGRConfiguration {
     }
 
     @Bean
+    public SHAKRegionDAO shakRegionDao() {
+        return new SHAKRegionDAOImpl();
+    }
+
+    @Bean
     public SKSDAO<SKSLine> sksDao() {
         return new GenericSKSLineDAOImpl();
     }
@@ -179,6 +190,11 @@ public class FGRConfiguration {
     public SORImporter sorParser() {
         return new SORImporter();
     }
+    
+    @Bean
+    public ShakRegionImporter shakRegionParser() {
+        return new ShakRegionImporter();
+    }
 
     @Bean
     public SLALogger slaLogger() {
@@ -188,6 +204,11 @@ public class FGRConfiguration {
     @Bean
     public URL shakRemoteUrl() throws MalformedURLException {
         return new URL(shakRemoteUrl);
+    }
+    
+    @Bean
+    public URL shakRegionRemoteUrl() throws MalformedURLException {
+        return new URL(shakRegionRemoteUrl);
     }
 
     @Bean

@@ -68,7 +68,6 @@ public class SORImporter implements Parser {
     @Autowired
     SORDAO dao;
 
-    @SuppressWarnings("unchecked")
     @Override
     public void process(File file, String identifier) {
         SLALogItem slaLogItem = slaLogger.createLogItem("sor.process", "SDM4.sor.process");
