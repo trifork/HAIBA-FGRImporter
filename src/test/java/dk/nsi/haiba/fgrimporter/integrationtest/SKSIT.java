@@ -31,6 +31,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -123,6 +124,7 @@ public class SKSIT {
         assertEquals(8930, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'pro'"));
         assertEquals(42222, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'dia'"));
         assertEquals(19955, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'opr'"));
+        assertEquals(2312, jdbc.queryForInt("SELECT COUNT(*) FROM klass_sks WHERE Type = 'atc'"));
     }
 
     @Test
@@ -135,8 +137,8 @@ public class SKSIT {
         process(sksParser, sksDao, "data/sks/SKScomplete.txt");
 
         Date validTo = jdbc.queryForObject("SELECT ValidTo FROM klass_shak WHERE Navn='Rigshospitalet'", Date.class);
-        Date validFrom = jdbc.queryForObject("SELECT ValidFrom FROM klass_shak WHERE Navn='Rigshospitalet'",
-                Date.class);
+        Date validFrom = jdbc
+                .queryForObject("SELECT ValidFrom FROM klass_shak WHERE Navn='Rigshospitalet'", Date.class);
 
         Date lastValidTo = formatter.parse("2500-01-01 23:59:58"); // 2500-01-02 00:00:00.0
         Date firstInvalidTo = formatter.parse("2500-01-02 00:00:01");
@@ -148,8 +150,11 @@ public class SKSIT {
         assertTrue(validFrom.after(lastInvalidBefore));
         assertTrue(validFrom.before(firstValidFrom));
 
-        validTo = jdbc.queryForObject("SELECT ValidTo FROM klass_sks WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'", Date.class);
-        validFrom = jdbc.queryForObject("SELECT ValidFrom FROM klass_sks WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'",
+        validTo = jdbc.queryForObject(
+                "SELECT ValidTo FROM klass_sks WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'",
+                Date.class);
+        validFrom = jdbc.queryForObject(
+                "SELECT ValidFrom FROM klass_sks WHERE Text='Selvmordsforsøg med anden metode før patientkontakt'",
                 Date.class);
         // from 201201012 to 25000101
         assertEquals(new Date(validFrom.getTime()), new Date(formatter.parse("2012-01-01 00:00:00").getTime()));
@@ -157,7 +162,8 @@ public class SKSIT {
     }
 
     private <T extends SKSLine> void process(SKSParser<T> parser, SKSDAO<T> dao, String string) throws IOException {
-        parser.process(toFile(getClass().getClassLoader().getResource(string)), "");
+        File file = toFile(getClass().getClassLoader().getResource(string));
+        parser.process(file, "");
         Set<T> entities = parser.getEntities();
         if (entities != null && !entities.isEmpty()) {
             dao.clearTable();
@@ -165,20 +171,20 @@ public class SKSIT {
                 dao.saveEntity(t);
             }
         }
-//        
-//        Map<String, List<T>> map = new HashMap<String, List<T>>(); 
-//        for (T t : entities) {
-//            List<T> list = map.get(t.getType());
-//            if (list == null) {
-//                list = new ArrayList<T>();
-//                map.put(t.getType(), list);
-//            }
-//            list.add(t);
-//        }
-//        
-//        Set<String> keySet = map.keySet();
-//        for (String key : keySet) {
-//            System.out.println("got "+map.get(key).size()+" of '"+key+"'");
-//        }
+        //
+        // Map<String, List<T>> map = new HashMap<String, List<T>>();
+        // for (T t : entities) {
+        // List<T> list = map.get(t.getType());
+        // if (list == null) {
+        // list = new ArrayList<T>();
+        // map.put(t.getType(), list);
+        // }
+        // list.add(t);
+        // }
+        //
+        // Set<String> keySet = map.keySet();
+        // for (String key : keySet) {
+        // System.out.println("got "+map.get(key).size()+" of '"+key+"'");
+        // }
     }
 }

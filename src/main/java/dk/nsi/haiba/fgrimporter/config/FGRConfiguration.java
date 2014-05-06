@@ -183,7 +183,7 @@ public class FGRConfiguration {
 
     @Bean
     public SKSParser<SKSLine> sksParser() {
-        return new SKSParser<SKSLine>(SKSLine.class, new String[] { "dia", "pro", "opr", "und" });
+        return new SKSParser<SKSLine>(SKSLine.class, new String[] { "dia", "pro", "opr", "und", "atc" });
     }
 
     @Bean
