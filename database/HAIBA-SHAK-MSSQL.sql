@@ -1,25 +1,21 @@
-CREATE TABLE klass_shak (
-	OrganisationPID BIGINT IDENTITY NOT NULL PRIMARY KEY,
-
-	Nummer VARCHAR(20) NOT NULL,
-	Navn VARCHAR(60),
-	Organisationstype VARCHAR(30) NOT NULL,
+CREATE TABLE Class_SHAK (
+    OrganisationPID BIGINT IDENTITY NOT NULL PRIMARY KEY,
+    Nummer VARCHAR(20) NOT NULL,
+    Navn VARCHAR(60),
+    Organisationstype VARCHAR(30) NOT NULL,
     Ejerforhold VARCHAR(20),
     Institutionsart VARCHAR(20),
     Regionskode VARCHAR(20),
-    
-	CreatedDate DATETIME NOT NULL,
-	ValidFrom DATETIME NOT NULL,
-	ValidTo DATETIME NOT NULL
+    CreatedDate DATETIME NOT NULL,
+    ValidFrom DATETIME NOT NULL,
+    ValidTo DATETIME NOT NULL
 );
 
-CREATE TABLE klass_sks (
+CREATE TABLE Class_SKS (
     ID BIGINT IDENTITY NOT NULL PRIMARY KEY,
-
     Code VARCHAR(20) NOT NULL,
     Text VARCHAR(60),
     Type VARCHAR(30) NOT NULL,
-
     Created DATETIME NOT NULL,
     ValidFrom DATETIME NOT NULL,
     ValidTo DATETIME NOT NULL

@@ -60,7 +60,7 @@ public class SHAKRegionDAOImpl extends CommonDAO implements SHAKRegionDAO {
             try {
                 String sql = "UPDATE "
                         + tableprefix
-                        + "klass_shak SET Ejerforhold=?, Institutionsart=?, Regionskode=? WHERE Nummer = ? AND ValidFrom = ? AND ValidTo = ?";
+                        + "class_shak SET Ejerforhold=?, Institutionsart=?, Regionskode=? WHERE Nummer = ? AND ValidFrom = ? AND ValidTo = ?";
 
                 Date datotil = shakRegion.getDatotil();
                 // add another day as in klass_shak

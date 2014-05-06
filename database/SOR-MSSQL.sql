@@ -1,5 +1,5 @@
-CREATE TABLE Klass_SOR (
+CREATE TABLE Class_SOR (
     Id BIGINT IDENTITY NOT NULL PRIMARY KEY,
     SOR_Id varchar(50) NOT NULL,
     SHAK varchar(10) NOT NULL
-);
+);  
