@@ -28,17 +28,17 @@ package dk.nsi.haiba.fgrimporter.integrationtest;
 
 import static org.apache.commons.io.FileUtils.toFile;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,6 +59,7 @@ import org.springframework.transaction.annotation.Transactional;
 import dk.nsi.haiba.fgrimporter.dao.SKSDAO;
 import dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl;
 import dk.nsi.haiba.fgrimporter.dao.impl.SHAKDAOImpl;
+import dk.nsi.haiba.fgrimporter.importer.FileFetch;
 import dk.nsi.haiba.fgrimporter.importer.SKSParser;
 import dk.nsi.haiba.fgrimporter.model.Organisation;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
@@ -108,6 +109,8 @@ public class SKSIT {
 
     @Before
     public void init() throws IOException {
+//        Logger.getLogger("dk.nsi.haiba.fgrimporter").setLevel(Level.DEBUG);
+//        Logger.getLogger("dk.nsi.haiba.fgrimporter.dao.impl.GenericSKSLineDAOImpl").setLevel(Level.INFO);
     }
 
     @Test
@@ -116,15 +119,15 @@ public class SKSIT {
         // FIXME: These record counts are only correct iff if duplicate keys are disregarted.
         // This is unfortunate. Keys are currently only considered based their SKSKode.
         // They should be a combination of type + kode + startdato based on the register doc.
-        assertEquals(745, jdbc.queryForInt("SELECT COUNT(*) FROM class_shak WHERE Organisationstype = 'Sygehus'"));
-        assertEquals(9754, jdbc.queryForInt("SELECT COUNT(*) FROM class_shak WHERE Organisationstype = 'Afdeling'"));
+        assertEquals(1017, jdbc.queryForInt("SELECT COUNT(*) FROM class_shak WHERE Organisationstype = 'Sygehus'"));
+        assertEquals(18411, jdbc.queryForInt("SELECT COUNT(*) FROM class_shak WHERE Organisationstype = 'Afdeling'"));
 
         process(sksParser, sksDao, "data/sks/SKScomplete.txt");
         assertEquals(573, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'und'"));
-        assertEquals(8930, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'pro'"));
-        assertEquals(42222, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'dia'"));
-        assertEquals(19955, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'opr'"));
-        assertEquals(2312, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'atc'"));
+        assertEquals(8990, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'pro'"));
+        assertEquals(43857, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'dia'"));
+        assertEquals(19980, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'opr'"));
+        assertEquals(10461, jdbc.queryForInt("SELECT COUNT(*) FROM class_sks WHERE Type = 'atc'"));
     }
 
     @Test

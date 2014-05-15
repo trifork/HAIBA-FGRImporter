@@ -37,8 +37,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.log4j.Logger;
 
-import com.google.common.base.Preconditions;
-
 import dk.nsi.haiba.fgrimporter.log.Log;
 import dk.nsi.haiba.fgrimporter.model.SKSLine;
 import dk.nsi.haiba.fgrimporter.parser.Parser;
@@ -115,9 +113,19 @@ public class SKSParser<T extends SKSLine> implements Parser {
 
     private Class<T> sksClass;
 
+    private boolean aImportAllLines = true;
+
     public SKSParser(Class<T> clazz, String[] parsablePrefixes) {
         sksClass = clazz;
         this.parsablePrefixes = new HashSet<String>(Arrays.asList(parsablePrefixes));
+    }
+
+    public boolean isImportAllLines() {
+        return aImportAllLines;
+    }
+
+    public void setImportAllLines(boolean importAllLines) {
+        aImportAllLines = importAllLines;
     }
 
     public Set<T> getEntities() {
@@ -178,7 +186,7 @@ public class SKSParser<T extends SKSLine> implements Parser {
         // Since the old record types do not have a operation code (and we are not
         // interested in those records) we can ignore the line.
         //
-        if (line.length() < OPERATION_CODE_INDEX + 1) {
+        if (!aImportAllLines && (line.length() < OPERATION_CODE_INDEX + 1)) {
             return null;
         }
 
@@ -186,7 +194,7 @@ public class SKSParser<T extends SKSLine> implements Parser {
         //
         char code = line.charAt(OPERATION_CODE_INDEX);
 
-        if (code == OPERATION_CODE_CREATE || code == OPERATION_CODE_UPDATE) {
+        if (aImportAllLines || code == OPERATION_CODE_CREATE || code == OPERATION_CODE_UPDATE) {
             // Create and update are handled the same way.
 
             T t = sksClass.newInstance();
